@@ -1,8 +1,0 @@
-README.md
-meowline.py
-setup.py
-meowline.egg-info/PKG-INFO
-meowline.egg-info/SOURCES.txt
-meowline.egg-info/dependency_links.txt
-meowline.egg-info/entry_points.txt
-meowline.egg-info/top_level.txt
