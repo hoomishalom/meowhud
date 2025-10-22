@@ -1,24 +1,25 @@
 CC := gcc
-CFLAGS := -Wall -Wextra
-LDFLAGS := 
-EXEC := meowline
+# CFLAGS := -Wall -Wextra -I./include -DWLR_USE_UNSTABLE  $(shell pkg-config --cflags --libs pixman-1) # the last one is to enable include of pixman.h
+CFLAGS := -I./include -DWLR_USE_UNSTABLE $(shell pkg-config --cflags --libs pixman-1) # the last one is to enable include of pixman.h
+LDFLAGS := -lwayland-client 
+EXEC := meowhud 
 SRCDIR := ./src/
 BUILDDIR := ./build/
-SRCFILES := $(shell ls $(SRCDIR)*.c)
+SRCFILES := $(wildcard $(SRCDIR)*.c)
 OBJFILES := $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES)) # generates obj files
 
-.SILENT:
+#.SILENT:
 
-$(BUILDDIR):
-	mkdir -p $(BUILDDIR)
-
-all: $(EXEC)
+all: $(BUILDDIR) $(EXEC)
 
 $(EXEC): $(OBJFILES)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(OBJFILES): $(SRCFILES)
+$(OBJFILES): $(BUILDDIR)%.o: $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
 
 clean:
 	rm -f $(OBJFILES) $(EXEC)
