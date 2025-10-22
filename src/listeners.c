@@ -31,8 +31,8 @@ const struct wl_registry_listener registry_listener = {
 static void handle_configure(void *data, struct zwlr_layer_surface_v1 *layer_surface, uint32_t serial, uint32_t width, uint32_t height) {
     MeowhudState *state = data;
 
-    assert(width == WIDTH);
-    assert(height == HEIGHT);
+    assert(width == state->width);
+    assert(height == state->height);
     
     state->configured = true;
     zwlr_layer_surface_v1_ack_configure(layer_surface, serial);
