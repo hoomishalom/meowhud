@@ -2,15 +2,8 @@
 #define STATE_H_INCLUDED
 
 #include <stdint.h>
+#include <pixman.h>
 #include <stdbool.h>
-
-typedef struct {
-    uint8_t a;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} Color;
-
 
 typedef struct meowhud_state {
     // Wayland Globals
@@ -27,7 +20,8 @@ typedef struct meowhud_state {
     struct wl_shm_pool *shm_pool;
     
     // Application Data
-    Color *pixels;
+    void *mmapped;
+    pixman_image_t *pix_img;
     int fd;
 
     // State Flags
@@ -35,12 +29,17 @@ typedef struct meowhud_state {
     bool skip;
     bool running;
 
-    // Surface Settings
-    int width;
-    int height;
-    int stride;
-    int shm_size;
+    // Surface Config 
+    uint32_t width;
+    uint32_t height;
+    uint32_t stride;
+    uint32_t shm_size;
 
+    // Text Config
+    uint32_t font_count;
+    uint32_t font_size;
+    char **font_names;
+    struct fcft_font *font;
 } MeowhudState;
 
 #endif

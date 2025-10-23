@@ -3,8 +3,52 @@
     "arguments": [
       "/usr/bin/gcc",
       "-g",
+      "-Wall",
+      "-Wextra",
       "-I./include",
       "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/pixman-1",
+      "-c",
+      "-o",
+      "build/draw.o",
+      "src/draw.c"
+    ],
+    "directory": "/home/hoomi/coding/c/meowhud",
+    "file": "/home/hoomi/coding/c/meowhud/src/draw.c",
+    "output": "/home/hoomi/coding/c/meowhud/build/draw.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-I./include",
+      "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/pixman-1",
+      "-c",
+      "-o",
+      "build/listeners.o",
+      "src/listeners.c"
+    ],
+    "directory": "/home/hoomi/coding/c/meowhud",
+    "file": "/home/hoomi/coding/c/meowhud/src/listeners.c",
+    "output": "/home/hoomi/coding/c/meowhud/build/listeners.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-I./include",
+      "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
       "-I/usr/include/pixman-1",
       "-c",
       "-o",
@@ -14,5 +58,65 @@
     "directory": "/home/hoomi/coding/c/meowhud",
     "file": "/home/hoomi/coding/c/meowhud/src/meowhud.c",
     "output": "/home/hoomi/coding/c/meowhud/build/meowhud.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-I./include",
+      "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/pixman-1",
+      "-c",
+      "-o",
+      "build/parser.o",
+      "src/parser.c"
+    ],
+    "directory": "/home/hoomi/coding/c/meowhud",
+    "file": "/home/hoomi/coding/c/meowhud/src/parser.c",
+    "output": "/home/hoomi/coding/c/meowhud/build/parser.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-I./include",
+      "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/pixman-1",
+      "-c",
+      "-o",
+      "build/wlr-layer-shell-unstable-v1-private.o",
+      "src/wlr-layer-shell-unstable-v1-private.c"
+    ],
+    "directory": "/home/hoomi/coding/c/meowhud",
+    "file": "/home/hoomi/coding/c/meowhud/src/wlr-layer-shell-unstable-v1-private.c",
+    "output": "/home/hoomi/coding/c/meowhud/build/wlr-layer-shell-unstable-v1-private.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-I./include",
+      "-DWLR_USE_UNSTABLE",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/pixman-1",
+      "-c",
+      "-o",
+      "build/xdg-shell.o",
+      "src/xdg-shell.c"
+    ],
+    "directory": "/home/hoomi/coding/c/meowhud",
+    "file": "/home/hoomi/coding/c/meowhud/src/xdg-shell.c",
+    "output": "/home/hoomi/coding/c/meowhud/build/xdg-shell.o"
   }
 ]

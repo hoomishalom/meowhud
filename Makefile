@@ -1,7 +1,6 @@
 CC := gcc
-# CFLAGS := -g -Wall -Wextra -I./include -DWLR_USE_UNSTABLE  $(shell pkg-config --cflags --libs pixman-1) # the last one is to enable include of pixman.h
-CFLAGS := -g -I./include  -DWLR_USE_UNSTABLE $(shell pkg-config --cflags --libs pixman-1) # the last one is to enable include of pixman.h
-LDFLAGS := -lwayland-client 
+CFLAGS := -ggdb -O0 -Wall -Wextra -I./include -DWLR_USE_UNSTABLE $(shell pkg-config --cflags fcft) $(shell pkg-config --cflags --libs pixman-1) # the last one is to enable include of pixman.h
+LDFLAGS := -lwayland-client  -lfcft
 EXEC := meowhud 
 SRCDIR := ./src/
 BUILDDIR := ./build/
