@@ -4,6 +4,18 @@
 #include <stdint.h>
 #include <pixman.h>
 #include <stdbool.h>
+#include <uchar.h>
+
+typedef struct {
+    char32_t *text;
+    size_t len;
+    uint32_t color;
+} Text_s;
+
+typedef struct {
+    Text_s left;
+    Text_s right;
+} Row_s;
 
 typedef struct meowhud_state {
     // Wayland Globals
@@ -40,6 +52,11 @@ typedef struct meowhud_state {
     uint32_t font_size;
     char **font_names;
     struct fcft_font *font;
+
+    // Contents 
+    uint32_t bg;
+    Row_s *content_rows;
 } MeowhudState;
+
 
 #endif

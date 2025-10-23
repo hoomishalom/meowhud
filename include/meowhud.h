@@ -1,8 +1,6 @@
 #ifndef MOEWLINE_H_INCLUDED
 #define MOEWLINE_H_INCLUDED
 
-#define _GNU_SOURCE
-
 #include <assert.h>
 #include <poll.h>
 #include <stdbool.h>
@@ -19,7 +17,7 @@
 #include <wlr/types/wlr_layer_shell_v1.h>
 
 #include "draw.h"
-#include "listeners.h"
 #include "types.h"
+#include "initializers.h"
 
 #endif
