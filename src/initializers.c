@@ -1,4 +1,5 @@
 #include "../include/initializers.h"
+#include "pixman.h"
 
 void init_state(MeowhudState *state) {
   // wayland globals
@@ -32,7 +33,7 @@ void init_state(MeowhudState *state) {
   setlocale(LC_ALL, "");
 
   state->font_count = 1;
-  state->font_size = 28;
+  state->font_size = 40;
   state->font_names = (char **)malloc(state->font_count * sizeof(char *));  // TODO: not use magic numbers
   state->font_names[0] = (char *)malloc(1024 * sizeof(char));
   sprintf(state->font_names[0], "Hack Nerd Font Mono:size=%d", state->font_size);
@@ -44,9 +45,19 @@ void init_state(MeowhudState *state) {
   }
 
   state->bg = 0x80808080;
+  state->row_count = 0;
+  state->content_rows = NULL;  
+  // this is the default defulat (double default) color
+  pixman_color_t default_color = { 
+    .red = 0x0000,
+    .green = 0x0000,
+    .blue = 0x0000,
+    .alpha = 0xffff
+  };
+  state->default_text_color = pixman_image_create_solid_fill(&default_color);
 }
 
-// gets and configures the layer, assumes state already ahs surface
+// gets and configures the layer, assumes state already has surface
 static void get_and_configure_layer(MeowhudState *state) {
   state->layer = zwlr_layer_shell_v1_get_layer_surface(
     state->layer_shell,

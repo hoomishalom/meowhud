@@ -11,26 +11,57 @@ int main(int argc, char *argv[]) {
   wl_display_roundtrip(state.display);
   wl_surface_commit(state.surface);
 
-  int temp = 0; 
-  int temp1 = 0; 
   int count = 0;
+  char32_t *text_l = U"abcd";
+  char32_t *text_r = U"efghi";
+  // Test
+  TextSection_s section1 = {
+    text_l,
+    4,
+    state.default_text_color,
+  };
+
+  TextSection_s section2 = {
+    text_r,
+    5,
+    state.default_text_color,
+  };
+
+  TextSection_s *sections1[] = {&section1, &section2};
+  TextSection_s *sections2[] = {&section2};
+
+  Text_s text1 = {
+    sections1,
+    2
+  };
+
+  Text_s text2 = {
+    sections2,
+    1
+  };
+
+  Row_s row = {
+    &text1,
+    &text2
+  };
+
+  state.content_rows = (Row_s **)malloc(5 * sizeof(Row_s *));
+  state.content_rows[0] = &row;
+  state.content_rows[1] = &row;
+  state.content_rows[2] = &row;
+  state.content_rows[3] = &row;
+  state.content_rows[4] = &row;
+  state.row_count = 5;
+
+  // End Test
+
+  render_bg(&state);
   while (state.running) {
     if (state.configured) {
-      memset(state.mmapped, state.bg, 4 * state.width * state.height); // writes all 1s (i.e. not transparent and white)
-      char32_t *text_l = U"left";
-      char32_t *text_r = U"right";
-      render_chars(text_l, state.pix_img, 4, 0, 100, state.width, false, NULL, state.font);
-      render_chars(text_r, state.pix_img, 5, state.width, 100, state.width, true, NULL, state.font);
+      render_rows(&state);
 
-      temp += 50;
-      temp1 += 60;
-      temp %= state.width; 
-      temp1 %= state.height; 
-
-      count++;
-
-      render_bar(&state);
-      printf("count:%d\n", count);
+      draw_bar(&state);
+      printf("count:%d\n", count++);
       wl_display_dispatch(state.display);
     }
     usleep(50000);

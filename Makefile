@@ -21,4 +21,4 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 clean:
-	rm -f $(OBJFILES) $(EXEC)
+	rm -rf $(BUILDDIR) $(EXEC) 
