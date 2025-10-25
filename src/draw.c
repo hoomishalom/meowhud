@@ -86,9 +86,9 @@ void render_rows(MeowhudState *state) {
     if ((curr_row->left) != NULL) {
       curr_text = curr_row->left;
       for (size_t j = 0; j < curr_row->left->section_count; j++) {
-        TextSection_s *curr_section = curr_text->sections[j];
-        render_chars(curr_section->text, state->pix_img, curr_section->len,
-                     &left_x, y, state->width, false, curr_section->color,
+        TextSection_s curr_section = curr_text->sections[j];
+        render_chars(curr_section.text, state->pix_img, curr_section.len,
+                     &left_x, y, state->width, false, curr_section.color,
                      state->font);
       }
     }
@@ -97,9 +97,9 @@ void render_rows(MeowhudState *state) {
    if ((curr_row->right)) {
       curr_text = curr_row->right;
       for (size_t j = 0; j < curr_row->right->section_count; j++) {
-        TextSection_s *curr_section = curr_text->sections[j];
-        render_chars(curr_section->text, state->pix_img, curr_section->len,
-                     &right_x, y, state->width, true, curr_section->color,
+        TextSection_s curr_section = curr_text->sections[j];
+        render_chars(curr_section.text, state->pix_img, curr_section.len,
+                     &right_x, y, state->width, true, curr_section.color,
                      state->font);
       }
     }

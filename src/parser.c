@@ -51,12 +51,12 @@ static void free_rows(Row_s **rows, size_t row_count) {
     Row_s *curr_row = rows[i];
 
     for (size_t j = 0; j < curr_row->left->section_count; j++) {
-      free(curr_row->left->sections[j]->text);
+      free(curr_row->left->sections[j].text);
     }
     free(curr_row->left->sections);
 
     for (size_t j = 0; j < curr_row->right->section_count; j++) {
-      free(curr_row->right->sections[j]->text);
+      free(curr_row->right->sections[j].text);
     }
     free(curr_row->right->sections);
 

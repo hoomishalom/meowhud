@@ -13,7 +13,7 @@ typedef struct {
 } TextSection_s;
 
 typedef struct {
-  TextSection_s **sections; // array of pointers to the sections
+  TextSection_s *sections; // array of pointers to the sections
   size_t section_count;
 } Text_s;
 

@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     state.default_text_color,
   };
 
-  TextSection_s *sections1[] = {&section1, &section2};
-  TextSection_s *sections2[] = {&section2};
+  TextSection_s sections1[] = {section1, section2};
+  TextSection_s sections2[] = {section2};
 
   Text_s text1 = {
     sections1,
