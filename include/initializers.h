@@ -15,11 +15,14 @@
 #include <wayland-client.h>
 #include <wlr/types/wlr_layer_shell_v1.h>
 
+#include "pixman.h"
+
 #include "types.h"
 #include "listeners.h"
+#include "parser.h"
 
-void init_state(MeowhudState *);
+void init_state(MeowhudState *state);
 
-void init_hud(MeowhudState *);
+void init_hud(MeowhudState *state);
 
 #endif

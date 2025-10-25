@@ -19,5 +19,6 @@
 #include "draw.h"
 #include "types.h"
 #include "initializers.h"
+#include "parser.h"
 
 #endif

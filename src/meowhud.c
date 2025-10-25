@@ -6,15 +6,20 @@ int main(int argc, char *argv[]) {
 
   MeowhudState state;
   init_state(&state);
+
+  parse_options(&state);
+
   init_hud(&state);
+
 
   wl_display_roundtrip(state.display);
   wl_surface_commit(state.surface);
 
+  // Test
   int count = 0;
   char32_t *text_l = U"abcd";
   char32_t *text_r = U"efghi";
-  // Test
+
   TextSection_s section1 = {
     text_l,
     4,
@@ -55,13 +60,13 @@ int main(int argc, char *argv[]) {
 
   // End Test
 
-  render_bg(&state);
   while (state.running) {
     if (state.configured) {
+      render_bg(&state);
       render_rows(&state);
 
       draw_bar(&state);
-      printf("count:%d\n", count++);
+
       wl_display_dispatch(state.display);
     }
     usleep(50000);

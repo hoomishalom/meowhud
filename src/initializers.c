@@ -1,5 +1,8 @@
 #include "../include/initializers.h"
+#include "parser.h"
 #include "pixman.h"
+#include "types.h"
+#include "wlr-layer-shell-unstable-v1-protocol.h"
 
 void init_state(MeowhudState *state) {
   // wayland globals
@@ -20,41 +23,34 @@ void init_state(MeowhudState *state) {
 
   // States
   state->configured = false;
-  state->skip = false;
   state->running = true;
 
   // Surface config
-  state->height = 500;
-  state->width = 500;
-  state->stride = 4 * state->width;
-  state->shm_size = state->stride * state->height;
+  state->height = 0;
+  state->width = 0;
+  state->stride = 0;
+  state->shm_size = 0;
+  state->anchor = 0;
 
   // Initialize font
   setlocale(LC_ALL, "");
 
-  state->font_count = 1;
-  state->font_size = 40;
-  state->font_names = (char **)malloc(state->font_count * sizeof(char *));  // TODO: not use magic numbers
-  state->font_names[0] = (char *)malloc(1024 * sizeof(char));
-  sprintf(state->font_names[0], "Hack Nerd Font Mono:size=%d", state->font_size);
+  state->font_count_max = 0;
+  state->font_count = 0;
+  state->font_names = NULL;
+  state->bg_color = NULL;
 
-  state->font = fcft_from_name(state->font_count, (const char**) state->font_names, NULL); // cast is to make lsp shut up
-  if (!state->font) {
-    fprintf(stderr, "Failed to load font\n");
-    exit(EXIT_FAILURE);
-  }
-
-  state->bg = 0x80808080;
+  state->row_spacing = 0;
   state->row_count = 0;
   state->content_rows = NULL;  
   // this is the default defulat (double default) color
-  pixman_color_t default_color = { 
+  pixman_color_t default_text_color = { 
     .red = 0x0000,
     .green = 0x0000,
     .blue = 0x0000,
     .alpha = 0xffff
   };
-  state->default_text_color = pixman_image_create_solid_fill(&default_color);
+  state->default_text_color = pixman_image_create_solid_fill(&default_text_color);
 }
 
 // gets and configures the layer, assumes state already has surface
@@ -67,7 +63,7 @@ static void get_and_configure_layer(MeowhudState *state) {
     ""
   );
 
-  zwlr_layer_surface_v1_set_anchor(state->layer, ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT | ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP);
+  zwlr_layer_surface_v1_set_anchor(state->layer, state->anchor);
   zwlr_layer_surface_v1_set_size(state->layer, state->width, state->height);
   wl_surface_commit(state->surface);
 }
@@ -79,7 +75,6 @@ void init_hud(MeowhudState *state) {
     fprintf(stderr, "Failed to establish connection with display :( !\n");
     exit(EXIT_FAILURE);
   }
-  printf("YES DISPLAY!\n");
 
   // gets registry
   state->registry = wl_display_get_registry(state->display);
@@ -87,7 +82,6 @@ void init_hud(MeowhudState *state) {
     fprintf(stderr, "Failed to get registery!\n");
     exit(EXIT_FAILURE);
   }
-  printf("YES REGISTRY!\n");
 
   wl_registry_add_listener(state->registry, &registry_listener, state);
   wl_display_roundtrip(state->display); // needs to get the compositor
@@ -96,6 +90,9 @@ void init_hud(MeowhudState *state) {
   get_and_configure_layer(state);
 
   // creates memory pool
+  state->stride = pixman_compute_stride(state->color_fmt, state->width);
+  state->shm_size = (state->stride) * (state->height);
+
   state->fd = memfd_create("meowhud_smp", 0); // creates a "file" in memory
   ftruncate(state->fd, state->shm_size);      // sets the size of the file
 
@@ -110,9 +107,10 @@ void init_hud(MeowhudState *state) {
   state->shm_pool = NULL;
   close(state->fd);
   state->fd = -1;
+  state->color_fmt = PIXMAN_a8r8g8b8;
 
   state->pix_img = pixman_image_create_bits_no_clear(
-    PIXMAN_a8r8g8b8,
+    state->color_fmt,
     state->width,
     state->height,
     state->mmapped,
@@ -124,3 +122,4 @@ void init_hud(MeowhudState *state) {
   zwlr_layer_surface_v1_add_listener(state->layer, &layer_surface_listener, state);
   wl_buffer_add_listener(state->buff, &buffer_listener, state);
 }
+
