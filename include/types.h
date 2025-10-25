@@ -38,12 +38,12 @@ typedef struct meowhud_state {
 
   // Application Data
   void *mmapped;
+  pixman_format_code_t color_fmt;
   pixman_image_t *pix_img;
   int fd;
 
   // State Flags
   bool configured;
-  bool skip;
   bool running;
 
   // Surface Config 
@@ -51,17 +51,19 @@ typedef struct meowhud_state {
   uint32_t height;
   uint32_t stride;
   uint32_t shm_size;
+  uint32_t anchor;
 
   // Text Config
+  uint32_t font_count_max;
   uint32_t font_count;
-  uint32_t font_size;
   char **font_names;
   struct fcft_font *font;
 
   // Contents 
-  uint32_t bg;
+  pixman_image_t *bg_color;
   Row_s **content_rows;
   size_t row_count;
+  size_t row_spacing;
   pixman_image_t *default_text_color;
 } MeowhudState;
 
