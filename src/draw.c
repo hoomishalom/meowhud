@@ -52,8 +52,9 @@ void render_chars(
   int text_width = 0;
   int avail_width = anchor_right ? *x : (surface_width - *x);
 
+  // TODO: maybe use fcft_rasterize_text_run_utf32?
   for (size_t i = 0; i < text_len; i++) {
-    glyphs[i] = fcft_rasterize_char_utf32(font, text[i], FCFT_SUBPIXEL_DEFAULT);
+    glyphs[i] = fcft_rasterize_char_utf32(font, text[i], FCFT_SUBPIXEL_NONE);
     if (glyphs[i] == NULL)
       continue;
 
@@ -104,11 +105,14 @@ void render_rows(MeowhudState *state) {
     }
 
     y += state->font->height; // advance to the y of the next line
+    y += state->row_spacing;
   }
 }
 
 void render_bg(MeowhudState *state) {
-  memset(state->mmapped, state->bg, 4 * state->width * state->height); // writes all 1s (i->e-> not transparent and white)
+  pixman_image_composite32(PIXMAN_OP_SRC, state->bg_color, NULL,
+                           state->pix_img, 0, 0, 0, 0, 0, 0, state->width,
+                           state->height);
 }
 
 void draw_bar(MeowhudState *state) {
