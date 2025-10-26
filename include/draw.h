@@ -23,6 +23,6 @@ void render_rows(MeowhudState *state);
 void render_bg(MeowhudState *state);
 
 // draws pix_img to the surface
-void draw_bar(MeowhudState *state);
+void draw_hud(MeowhudState *state);
 
 #endif

@@ -48,7 +48,6 @@ const struct zwlr_layer_surface_v1_listener layer_surface_listener = {
 };
 
 static void handle_release(void *data, struct wl_buffer *buffer) {
-  MeowhudState *state = data;
 }
 
 const struct wl_buffer_listener buffer_listener = {

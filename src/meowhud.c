@@ -11,65 +11,65 @@ int main(int argc, char *argv[]) {
 
   init_hud(&state);
 
-
   wl_display_roundtrip(state.display);
   wl_surface_commit(state.surface);
+  wl_display_roundtrip(state.display);
+  wl_display_roundtrip(state.display);
 
-  // Test
-  int count = 0;
-  char32_t *text_l = U"abcd";
-  char32_t *text_r = U"efghi";
+  struct pollfd poll_stdin;
+  poll_stdin.fd = STDIN_FILENO;
+  poll_stdin.events = POLLIN;
 
-  TextSection_s section1 = {
-    text_l,
-    4,
-    state.default_text_color,
-  };
+  struct pollfd poll_display;
+  poll_display.fd = wl_display_get_fd(state.display);
+  poll_display.events = POLLIN;
 
-  TextSection_s section2 = {
-    text_r,
-    5,
-    state.default_text_color,
-  };
-
-  TextSection_s sections1[] = {section1, section2};
-  TextSection_s sections2[] = {section2};
-
-  Text_s text1 = {
-    sections1,
-    2
-  };
-
-  Text_s text2 = {
-    sections2,
-    1
-  };
-
-  Row_s row = {
-    &text1,
-    &text2
-  };
-
-  state.content_rows = (Row_s **)malloc(5 * sizeof(Row_s *));
-  state.content_rows[0] = &row;
-  state.content_rows[1] = &row;
-  state.content_rows[2] = &row;
-  state.content_rows[3] = &row;
-  state.content_rows[4] = &row;
-  state.row_count = 5;
-
-  // End Test
+  struct pollfd pfds[2] = {poll_stdin, poll_display};
 
   while (state.running) {
-    if (state.configured) {
-      render_bg(&state);
-      render_rows(&state);
+    int ret = poll(pfds, 2, -1); // -1 means no timeout
 
-      draw_bar(&state);
+    if (ret > 0) {
+      // poll stdin
+      if (pfds[0].revents & POLLIN) { // will be zero if POLLIN isnt one
+        if (state.configured) {
+          parse_frame(&state);
 
-      wl_display_dispatch(state.display);
+          render_bg(&state);
+          render_rows(&state);
+
+          draw_hud(&state);
+        }
+        pfds[0].events = POLLIN; // safer this way
+      } else if (pfds[0].revents & POLLHUP) {
+        fprintf(stderr, "stdin hung up\n");
+        return EXIT_FAILURE;
+      } else if (pfds[0].revents & POLLNVAL) {
+        fprintf(stderr, "stdin not open\n");
+        return EXIT_FAILURE;
+      } else if (pfds[0].revents & POLLERR) {
+        fprintf(stderr, "stdin hung up\n");
+        return EXIT_FAILURE;
+      }
+
+      // poll display
+      if (pfds[1].revents & POLLIN) {
+        wl_display_dispatch(state.display);
+      } else if (pfds[1].revents & POLLHUP) {
+        fprintf(stderr, "display fd hung up\n");
+        return EXIT_FAILURE;
+      } else if (pfds[1].revents & POLLNVAL) {
+        fprintf(stderr, "display fd not open\n");
+        return EXIT_FAILURE;
+      } else if (pfds[1].revents & POLLERR) {
+        fprintf(stderr, "display fd hung up\n");
+        return EXIT_FAILURE;
+      }
+      pfds[1].events = POLLIN; // safer this way
+    } else if (ret == -1) { // Note: there is also a return value of 0, won't be reached due to no timeout
+      fprintf(stderr, "poll failed\n");
+      return EXIT_FAILURE;
     }
-    usleep(50000);
   }
 
   return EXIT_FAILURE;

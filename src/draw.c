@@ -87,9 +87,15 @@ void render_rows(MeowhudState *state) {
       curr_text = curr_row->left;
       for (size_t j = 0; j < curr_row->left->section_count; j++) {
         TextSection_s curr_section = curr_text->sections[j];
-        render_chars(curr_section.text, state->pix_img, curr_section.len,
-                     &left_x, y, state->width, false, curr_section.color,
-                     state->font);
+        if (curr_section.color != NULL) {
+          render_chars(curr_section.text, state->pix_img, curr_section.len,
+                       &left_x, y, state->width, false, curr_section.color,
+                       state->font);
+        } else { // use default color
+          render_chars(curr_section.text, state->pix_img, curr_section.len,
+                       &left_x, y, state->width, false, state->default_text_color,
+                       state->font);
+        }
       }
     }
 
@@ -98,9 +104,15 @@ void render_rows(MeowhudState *state) {
       curr_text = curr_row->right;
       for (size_t j = 0; j < curr_row->right->section_count; j++) {
         TextSection_s curr_section = curr_text->sections[j];
-        render_chars(curr_section.text, state->pix_img, curr_section.len,
-                     &right_x, y, state->width, true, curr_section.color,
-                     state->font);
+        if (curr_section.color != NULL) { 
+          render_chars(curr_section.text, state->pix_img, curr_section.len,
+                       &right_x, y, state->width, true, curr_section.color,
+                       state->font);
+        } else { // use default color
+          render_chars(curr_section.text, state->pix_img, curr_section.len,
+                       &right_x, y, state->width, true, state->default_text_color,
+                       state->font);
+        }
       }
     }
 
@@ -115,7 +127,7 @@ void render_bg(MeowhudState *state) {
                            state->height);
 }
 
-void draw_bar(MeowhudState *state) {
+void draw_hud(MeowhudState *state) {
   wl_surface_attach(state->surface, state->buff, 0, 0);
   wl_surface_damage(state->surface, 0, 0, state->width, state->height);
   wl_surface_commit(state->surface);

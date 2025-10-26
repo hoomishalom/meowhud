@@ -12,14 +12,22 @@
 
 #define DELIMITER ";"
 #define DONE_MARKER "DONE"
+#define RIGHT_ALIGNMENT "r"
+#define LEFT_ALIGNMENT "l"
 #define LENGTH_OF_BG_COLOR 8
 #define LENGTH_OF_TEXT_COLOR 8 
 #define LENGTH_OF_ANCHOR 4
 
+// the minimum difference between the amount of allocated sections
+// and used sections in a Text_s
+#define DOWNSIZING_THRESHOLD 10
+
 // calculates the appropriate stride value
-int pixman_compute_stride(pixman_format_code_t format, int width);
+uint32_t pixman_compute_stride(pixman_format_code_t format, int width);
 
 void parse_options(MeowhudState *state);
+
+void parse_frame(MeowhudState *state);
 
 #endif
 

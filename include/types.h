@@ -8,13 +8,14 @@
 
 typedef struct {
   char32_t *text;
-  size_t len;
+  uint32_t len;
   pixman_image_t *color;
 } TextSection_s;
 
 typedef struct {
   TextSection_s *sections; // array of pointers to the sections
-  size_t section_count;
+  uint32_t section_count_max; // this is the allocated amount
+  uint32_t section_count; // this is the actual used amount
 } Text_s;
 
 typedef struct {
@@ -62,8 +63,8 @@ typedef struct meowhud_state {
   // Contents 
   pixman_image_t *bg_color;
   Row_s **content_rows;
-  size_t row_count;
-  size_t row_spacing;
+  uint32_t row_count;
+  uint32_t row_spacing;
   pixman_image_t *default_text_color;
 } MeowhudState;
 
