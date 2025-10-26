@@ -46,4 +46,4 @@ DONE
 
 And in general, each line should look like:
 
-`line number;align (r or l);text length;text color (empty for default);text`
+`line number (0 < value < row_count);align (r or l);text length;text color (empty for default);text`
