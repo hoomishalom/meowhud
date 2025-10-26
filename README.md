@@ -34,15 +34,16 @@ will be calcualted to allow exactly `row_count` rows).
 ## Frames
 
 Then, every following message should be one containing a
-frame. For example:
+frame, ended by a DONE. For example:
 
 ```
-1;r;4;;meow
-1;l;7;ff000000;meow :)
-1;l;5;ff00ff00;green
-2;l;13;;default color
+1;r;;meow
+1;l;ff000000;meow :)
+1;l;ff00ff00;green
+2;l;;default color
+DONE
 ```
 
 And in general, each line should look like:
 
-`line number;align (r or l);text length;text color (empty for default);text`
+`line number (0 < value < row_count);align (r or l);text color (empty for default);text`
