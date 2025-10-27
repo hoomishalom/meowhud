@@ -13,8 +13,6 @@ int main(int argc, char *argv[]) {
 
   wl_display_roundtrip(state.display);
   wl_surface_commit(state.surface);
-  // wl_display_roundtrip(state.display);
-  // wl_display_roundtrip(state.display);
 
   struct pollfd poll_stdin;
   poll_stdin.fd = STDIN_FILENO;
@@ -28,7 +26,6 @@ int main(int argc, char *argv[]) {
 
   while (state.running) {
     int ret = poll(pfds, 2, -1); // -1 means no timeout
-    printf("test\n");
 
     if (ret > 0) {
       // poll stdin
