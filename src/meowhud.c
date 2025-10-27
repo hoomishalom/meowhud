@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
 
   wl_display_roundtrip(state.display);
   wl_surface_commit(state.surface);
-  wl_display_roundtrip(state.display);
-  wl_display_roundtrip(state.display);
+  // wl_display_roundtrip(state.display);
+  // wl_display_roundtrip(state.display);
 
   struct pollfd poll_stdin;
   poll_stdin.fd = STDIN_FILENO;
