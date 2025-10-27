@@ -23,7 +23,7 @@ Other dependencies are:
 # Protocol Explanation
 ## Options
 Firstly, the first message should be a sequence of options
-data ended by an `DONE` ([list](#option-list)). For example:
+data ended by a `DONE` ([list](#option-list)). For example:
 
 ```
 font_count_max;2
