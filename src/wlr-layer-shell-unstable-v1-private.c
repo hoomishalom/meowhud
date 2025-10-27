@@ -78,8 +78,7 @@ static const struct wl_message zwlr_layer_surface_v1_requests[] = {
 	{ "get_popup", "o", wlr_layer_shell_unstable_v1_types + 9 },
 	{ "ack_configure", "u", wlr_layer_shell_unstable_v1_types + 0 },
 	{ "destroy", "", wlr_layer_shell_unstable_v1_types + 0 },
-	{ "set_layer", "2u", wlr_layer_shell_unstable_v1_types + 0 },
-	{ "set_exclusive_edge", "5u", wlr_layer_shell_unstable_v1_types + 0 },
+	{ "set_layer", "2u", wlr_layer_shell_unstable_v1_types + 0 }, { "set_exclusive_edge", "5u", wlr_layer_shell_unstable_v1_types + 0 },
 };
 
 static const struct wl_message zwlr_layer_surface_v1_events[] = {

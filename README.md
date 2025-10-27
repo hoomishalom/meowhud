@@ -1,4 +1,24 @@
-A simple status HUD.
+A simple Wayland status HUD, inspired by [bread](https://github.com/netfri25/bread).
+
+# Usage
+Needs a "content creator", a program that makes the frames
+and defines the [options](optoins).
+
+```
+content_creator | meowhud
+```
+
+In addition, can be used manually by just running ```meowhud```,
+this is one of the design motiviations behind the final
+protocol.
+
+# Dependencies
+All dependencies that are not "easily" installed are
+included in the project files.
+Other dependencies are:
+* [fcft](https://codeberg.org/dnkl/fcft)
+* pixman
+* A Wayland compositor
 
 # Protocol Explanation
 ## Options
@@ -6,7 +26,7 @@ Firstly, the first message should be a sequence of options
 data ended by an `DONE` ([list](#option-list)). For example:
 
 ```
-font_count;2
+font_count_max;2
 font_name;First Font Name:size=12
 font_name;Second Font Name:size=14:slant=italic
 bg_color;ff001122
@@ -18,18 +38,18 @@ DONE
 
 #### Font
 
-* `font_count`: The amount of fonts that will be given.
-* `font_name`: A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute2=value1:attribute1=value2:...`.
+* `font_count_max`: (Required) An upper bound on the amount of fonts that will be given.
+* `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute2=value1:attribute1=value2:...`.
+* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB`.
 
 #### Window
 
-* `width`: The width of the window.
+* `width`: (Required) The width of the window.
 * `height`: The height of the window (if not given, height
 will be calcualted to allow exactly `row_count` rows).
-* `row_count`: The amount of row that will be used.
-* `bg_color`: The color of the background, format: `AARRGGBB`.
-* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB`.
-* `anchor`: Anchoring bit mask `right||left||bottom||top` (all 0's for centered, example top-right `1001`).
+* `row_count`: (Required) The amount of row that will be used.
+* `bg_color`: (Required) The color of the background, format: `AARRGGBB`.
+* `anchor`: (Required) Anchoring bit mask `right||left||bottom||top` (all 0's for centered, example: top-right `1001`).
 
 ## Frames
 

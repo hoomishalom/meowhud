@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 
   while (state.running) {
     int ret = poll(pfds, 2, -1); // -1 means no timeout
+    printf("test\n");
 
     if (ret > 0) {
       // poll stdin

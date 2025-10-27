@@ -79,10 +79,9 @@ static void init_fonts(MeowhudState *state) {
   }
 }
 
-/* checks required fields which are:
- * width, height (if row_count isn't set), font_count_max, font_name,
- * bg_color, row_count 
- */
+// checks required fields which are:
+// width, height (if row_count isn't set), font_count_max, font_name,
+// bg_color, row_count 
 static void check_required(MeowhudState *state) {
   bool valid = true;
 
