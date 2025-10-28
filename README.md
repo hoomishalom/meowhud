@@ -44,7 +44,7 @@ DONE
 
 #### Window
 
-* `width`: (Required) The width of the window.
+* `width`: (Required) The width of the window. if set to 0, then the compositor will decide the width of the hud (can be useful if combined with left and right anchors).
 * `height`: The height of the window (if not given, height
 will be calcualted to allow exactly `row_count` rows).
 * `row_count`: (Required) The amount of row that will be used.
