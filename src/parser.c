@@ -439,6 +439,5 @@ void parse_frame(MeowhudState *state) {
     handle_frame_line(state, line);
   }
 
-  printf("test\n");
   free(line);
 }
