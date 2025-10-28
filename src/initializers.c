@@ -88,6 +88,10 @@ void init_hud(MeowhudState *state) {
 
   state->surface = wl_compositor_create_surface(state->compositor);
   get_and_configure_layer(state);
+  zwlr_layer_surface_v1_add_listener(state->layer, &layer_surface_listener, state);
+}
+
+void init_buffer(MeowhudState *state) {
 
   // creates memory pool
   state->stride = pixman_compute_stride(state->color_fmt, state->width);
@@ -124,7 +128,5 @@ void init_hud(MeowhudState *state) {
 
   wl_surface_attach(state->surface, state->buff, 0, 0);
 
-  zwlr_layer_surface_v1_add_listener(state->layer, &layer_surface_listener, state);
   wl_buffer_add_listener(state->buff, &buffer_listener, state);
 }
-
