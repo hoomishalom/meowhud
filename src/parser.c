@@ -162,7 +162,7 @@ static void handle_options_line(char *line,
     int32_t height = atoi(value);
 
     if (height <= 0) {
-      if (strcmp(value, "0")) {
+      if (strcmp(value, "0") == 0) {
         fprintf(stderr, "height can't be 0\n");
       } else {
         fprintf(stderr, "invalid height (is %s)\n", value);
