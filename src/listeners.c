@@ -32,11 +32,16 @@ static void handle_configure(void *data,
                              uint32_t serial, uint32_t width, uint32_t height) {
   MeowhudState *state = data;
 
-  assert(width == (state->width));
-  assert(height == (state->height));
+  zwlr_layer_surface_v1_ack_configure(layer_surface, serial);
+
+  // instead of asserting that the width and height are the same, just comply to the compositor
+  state->width = width;
+  state->height = height;
 
   state->configured = true;
-  zwlr_layer_surface_v1_ack_configure(layer_surface, serial);
+
+  // initialize the buffer with the new size
+  init_buffer(state);
 }
 
 static void handle_closed(void *data, struct zwlr_layer_surface_v1 *layer_surface) {

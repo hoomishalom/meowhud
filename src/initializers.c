@@ -88,18 +88,27 @@ void init_hud(MeowhudState *state) {
 
   state->surface = wl_compositor_create_surface(state->compositor);
   get_and_configure_layer(state);
+  zwlr_layer_surface_v1_add_listener(state->layer, &layer_surface_listener, state);
+}
+
+void init_buffer(MeowhudState *state) {
 
   // creates memory pool
   state->stride = pixman_compute_stride(state->color_fmt, state->width);
+
+  const uint32_t old_shm_size = state->shm_size;
   state->shm_size = (state->stride) * (state->height);
 
   state->fd = memfd_create("meowhud_smp", 0); // creates a "file" in memory
   ftruncate(state->fd, state->shm_size);      // sets the size of the file
 
+  if (state->shm_pool != NULL) wl_shm_pool_destroy(state->shm_pool);
   state->shm_pool = wl_shm_create_pool( state->shm, state->fd, state->shm_size); // creates shared memory pool
 
+  if (state->mmapped != NULL) munmap(state->mmapped, old_shm_size);
   state->mmapped = mmap(NULL, state->shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0); // "mounts" the file descriptor onto a memory location so it will be writeable
 
+  if (state->buff != NULL) wl_buffer_destroy(state->buff);
   state->buff = wl_shm_pool_create_buffer(state->shm_pool, 0, state->width, state->height, state->stride, WL_SHM_FORMAT_ARGB8888);
 
   /* We use the entire pool for our single buffer */
@@ -119,7 +128,5 @@ void init_hud(MeowhudState *state) {
 
   wl_surface_attach(state->surface, state->buff, 0, 0);
 
-  zwlr_layer_surface_v1_add_listener(state->layer, &layer_surface_listener, state);
   wl_buffer_add_listener(state->buff, &buffer_listener, state);
 }
-

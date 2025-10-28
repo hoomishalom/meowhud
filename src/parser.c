@@ -85,11 +85,6 @@ static void init_fonts(MeowhudState *state) {
 static void check_required(MeowhudState *state) {
   bool valid = true;
 
-  if (state->width == 0) {
-    fprintf(stderr, "width is not set\n"); 
-    valid = false;
-  }
-
   if (state->height == 0 && state->row_count == 0) {
     fprintf(stderr, "height is not set (you could set row_count and"
             " height will be set automatically)\n"); 
@@ -155,27 +150,28 @@ static void handle_options_line(char *line,
     strcpy(state->font_names[state->font_count], value);
     (state->font_count)++;
   } else if (strcmp(option, "width") == 0) {
-    uint32_t width = atoi(value);
+    int32_t width = atoi(value);
 
-    if (width <= 0) {
-      fprintf(stderr,
-              "width is too small or an error has occurred (is: %d, min: %d)\n",
-              width, 0);
+    if (width <= 0 && strcmp(value, "0") != 0) {
+      fprintf(stderr, "invalid width (is: %s)\n", value);
       return;
     }
 
-    state->width = width;
+    state->width = (uint32_t) width;
   } else if (strcmp(option, "height") == 0) {
-    uint32_t height = atoi(value);
+    int32_t height = atoi(value);
 
     if (height <= 0) {
-      fprintf(stderr,
-              "height is too small or an error has occurred (is: %d, min: %d)\n",
-              height, 0);
+      if (strcmp(value, "0") == 0) {
+        fprintf(stderr, "height can't be 0\n");
+      } else {
+        fprintf(stderr, "invalid height (is %s)\n", value);
+      }
+
       return;
     }
 
-    state->height = height;
+    state->height = (uint32_t) height;
   } else if (strcmp(option, "row_count") == 0) { // TODO: doesnt allocate space
     uint32_t row_count = atoi(value);
 

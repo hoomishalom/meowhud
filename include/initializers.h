@@ -25,4 +25,6 @@ void init_state(MeowhudState *state);
 
 void init_hud(MeowhudState *state);
 
+void init_buffer(MeowhudState *state);
+
 #endif
