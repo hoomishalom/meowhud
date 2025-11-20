@@ -26,11 +26,13 @@ Firstly, the first message should be a sequence of options
 data ended by a `DONE` ([list](#option-list)). For example:
 
 ```
-font_count_max;2
-font_name;First Font Name:size=12
-font_name;Second Font Name:size=14:slant=italic
-bg_color;ff001122
-anchor;1001
+font_count_max;1
+font_name;Hack Nerd Font:size=24:slant=italic   
+width;0
+bg_color;80e53939
+row_count;5
+anchor;1101
+row_spacing;20
 DONE
 ```
 
