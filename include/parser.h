@@ -1,14 +1,11 @@
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "types.h"
-
 #include "pixman.h"
-#include "fcft/fcft.h"
 
 #define DELIMITER ";"
 #define DONE_MARKER "DONE"

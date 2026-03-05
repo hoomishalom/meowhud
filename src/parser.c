@@ -1,15 +1,22 @@
 #include "../include/parser.h"
-#include "pixman.h"
-#include "types.h"
+#include "../include/utils.h"
+
 #include <errno.h>
 #include <stdint.h>
 #include <unistd.h>
-#include "../include/utils.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcft/fcft.h>
+#include <pixman.h>
+
+#include "types.h"
 
 extern int errno;
 
-uint32_t pixman_compute_stride(pixman_format_code_t format, int width)
-{
+uint32_t pixman_compute_stride(pixman_format_code_t format, int width) {
+  (void)format;
+
   uint32_t stride = 4 * width;
 
   return stride;

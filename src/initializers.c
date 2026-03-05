@@ -1,8 +1,17 @@
+#define _GNU_SOURCE
 #include "../include/initializers.h"
-#include "parser.h"
-#include "pixman.h"
-#include "types.h"
+#include "../include/parser.h"
+#include "../include/listeners.h"
+#include "../include/types.h"
 #include "wlr-layer-shell-unstable-v1-protocol.h"
+
+#include <sys/mman.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <fcft/fcft.h>
+#include <pixman.h>
 
 void init_state(MeowhudState *state) {
   // wayland globals

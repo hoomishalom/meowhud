@@ -1,8 +1,11 @@
 #include "../include/listeners.h"
-#include "../include/meowhud.h"
+#include "../include/types.h"
+#include "../include/initializers.h"
+#include <string.h>
 
 static void registry_handle_global(void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version)
 {
+  (void)version; // Silence compiler warnings
   MeowhudState *state = data;
 
   if (strcmp(interface, wl_compositor_interface.name) == 0) {
@@ -19,6 +22,9 @@ static void registry_handle_global(void *data, struct wl_registry *registry, uin
 
 static void registry_handle_global_remove(void *data, struct wl_registry *registry, uint32_t name) {
   // This space deliberately left blank
+  (void)data; // Silence compiler warnings
+  (void)registry; // Silence compiler warnings
+  (void)name; // Silence compiler warnings
 }
 
 
@@ -45,6 +51,8 @@ static void handle_configure(void *data,
 }
 
 static void handle_closed(void *data, struct zwlr_layer_surface_v1 *layer_surface) {
+  (void)data; // Silence compiler warnings
+  (void)layer_surface; // Silence compiler warnings
 }
 
 const struct zwlr_layer_surface_v1_listener layer_surface_listener = {
@@ -53,6 +61,8 @@ const struct zwlr_layer_surface_v1_listener layer_surface_listener = {
 };
 
 static void handle_release(void *data, struct wl_buffer *buffer) {
+  (void)data; // Silence compiler warnings
+  (void)buffer; // Silence compiler warnings
 }
 
 const struct wl_buffer_listener buffer_listener = {

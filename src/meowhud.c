@@ -1,15 +1,38 @@
-#include "../include/meowhud.h"
+#include <assert.h>
+#include <poll.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
 
+#include <fcft/fcft.h>
+#include <locale.h>
+
+#include <wayland-client.h>
+#include <wlr/types/wlr_layer_shell_v1.h>
+
+#include "../include/draw.h"
+#include "../include/types.h"
+#include "../include/initializers.h"
+#include "../include/parser.h"
+
 static volatile sig_atomic_t keep_running = 1;
 
 static void handle_signal(int sig) {
+  (void)sig; // Silence compiler warnings
+
   keep_running = 0;
 }
 
 int main(int argc, char *argv[]) {
+  (void)argc; // Silence compiler warnings
+  (void)argv; // Silence compiler warnings
+
   fcft_init(FCFT_LOG_COLORIZE_NEVER, false, FCFT_LOG_CLASS_NONE);
 
   struct sigaction sa;

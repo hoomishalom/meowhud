@@ -2,13 +2,10 @@
 #define DRAW_H_INCLUDED
 
 #include <uchar.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 #include <fcft/fcft.h>
-#include <wayland-client.h>
-
 #include "types.h"
 
 // puts the text, formatted on pix_img

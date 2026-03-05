@@ -1,5 +1,7 @@
 #include "../include/draw.h"
 #include "../include/utils.h"
+#include <stdlib.h>
+#include <wayland-client.h>
 
 static void render_glyphs(
   pixman_image_t *result,
