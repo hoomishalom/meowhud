@@ -215,7 +215,7 @@ static void handle_options_line(char *line,
   } else if (strcmp(option, "bg_color") == 0) { // doesn't check that value has actual hex
     if (strlen(value) != LENGTH_OF_BG_COLOR) {
       fprintf(stderr,
-              "bg_color isn't of the correct length (is: %lu, should: %d)\n",
+              "bg_color isn't of the correct length (is: %zu, should: %d)\n",
               strlen(value), LENGTH_OF_BG_COLOR);
       return;
     }
@@ -227,7 +227,7 @@ static void handle_options_line(char *line,
   } else if (strcmp(option, "default_text_color") == 0) { // doesn't check that vlue has actual hex
     if (strlen(value) != LENGTH_OF_TEXT_COLOR) {
       fprintf(stderr,
-              "default_text_color isn't of the correct length (is: %lu, should: %d)\n",
+              "default_text_color isn't of the correct length (is: %zu, should: %d)\n",
               strlen(value), LENGTH_OF_TEXT_COLOR);
       return;
     }
@@ -239,7 +239,7 @@ static void handle_options_line(char *line,
   } else if (strcmp(option, "anchor") == 0) { // doesnt check value has actual bits (and not any number)
     if (strlen(value) != LENGTH_OF_ANCHOR) {
       fprintf(stderr,
-              "anchor isn't of the correct length (is: %lu, should: %d)\n",
+              "anchor isn't of the correct length (is: %zu, should: %d)\n",
               strlen(value), LENGTH_OF_ANCHOR);
       return;
     }
@@ -315,7 +315,8 @@ static bool verify_frame_values(MeowhudState *state, char *line_num, char *align
   }
 
   if (strlen(color) != LENGTH_OF_TEXT_COLOR && strlen(color) != 0) {
-    fprintf(stderr, "Bad length of color (is: %lu, should: %d)", strlen(color), LENGTH_OF_TEXT_COLOR);
+    fprintf(stderr, "Bad length of color (is: %zu, should: %d)", strlen(color),
+            LENGTH_OF_TEXT_COLOR);
     valid = false;
   }
 
