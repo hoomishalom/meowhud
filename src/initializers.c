@@ -79,6 +79,12 @@ static void get_and_configure_layer(MeowhudState *state) {
 
   zwlr_layer_surface_v1_set_anchor(state->layer, state->anchor);
   zwlr_layer_surface_v1_set_size(state->layer, state->width, state->height);
+
+  // Make the surface pass-through for mouse events
+  struct wl_region *empty_region = wl_compositor_create_region(state->compositor);
+  wl_surface_set_input_region(state->surface, empty_region);
+  wl_region_destroy(empty_region);
+
   wl_surface_commit(state->surface);
 }
 
