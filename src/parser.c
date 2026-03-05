@@ -35,17 +35,17 @@ static pixman_color_t get_color_8_to_16(char *color_string){
 }
 
 static void init_rows(Row_s ***rows, size_t row_count) {
-  *rows = (Row_s **)malloc(row_count * sizeof(Row_s *));
+  *rows = (Row_s **)safe_malloc(row_count * sizeof(Row_s *));
 
   for (size_t i = 0; i < row_count; i++) {
-    Row_s *curr_row = (Row_s *)malloc(sizeof(Row_s));
+    Row_s *curr_row = (Row_s *)safe_malloc(sizeof(Row_s));
 
-    curr_row->left = (Text_s *)malloc(sizeof(Text_s));
+    curr_row->left = (Text_s *)safe_malloc(sizeof(Text_s));
     curr_row->left->sections = NULL;
     curr_row->left->section_count = 0;
     curr_row->left->section_count_max = 0;
 
-    curr_row->right = (Text_s *)malloc(sizeof(Text_s));
+    curr_row->right = (Text_s *)safe_malloc(sizeof(Text_s));
     curr_row->right->sections = NULL;
     curr_row->right->section_count = 0;
     curr_row->right->section_count_max = 0;
@@ -152,7 +152,7 @@ static void handle_options_line(char *line,
     state->font_count = 0;
 
     state->font_count_max = font_count_max; 
-    state->font_names = (char **)malloc(state->font_count_max * sizeof(char *));
+    state->font_names = (char **)safe_malloc(state->font_count_max * sizeof(char *));
 
     for (size_t i = 0; i < (state->font_count_max); i++) {
       state->font_names[i] = NULL;
@@ -163,7 +163,7 @@ static void handle_options_line(char *line,
       return;
     }
 
-    state->font_names[state->font_count] = (char *)malloc((strlen(value) + 1) * sizeof(char));
+    state->font_names[state->font_count] = (char *)safe_malloc((strlen(value) + 1) * sizeof(char));
     strcpy(state->font_names[state->font_count], value);
     (state->font_count)++;
   } else if (strcmp(option, "width") == 0) {
@@ -330,8 +330,7 @@ static bool verify_frame_values(MeowhudState *state, char *line_num, char *align
 // transforms src (utf8) to dest (char32_t) and returns the length of dest
 static uint32_t utf8_to_char32(char *src, char32_t **dest) {
   size_t len = strlen(src);
-  char32_t *out = malloc((len + 1) * sizeof(char32_t)); // worst-case size
-  if (!out) return 0;
+  char32_t *out = safe_malloc((len + 1) * sizeof(char32_t)); // worst-case size
 
   mbstate_t state = {0};
   const char *ptr = src;
@@ -361,7 +360,7 @@ static uint32_t utf8_to_char32(char *src, char32_t **dest) {
 
   out[out_i] = U'\0'; // Null-terminate char32_t string
 
-  out = realloc(out, (out_i + 1) * sizeof(char32_t));
+  out = safe_realloc(out, (out_i + 1) * sizeof(char32_t));
 
   (*dest) = out;
 
@@ -381,13 +380,13 @@ static void add_section_to_text(Text_s *text, char *data, pixman_image_t *color)
   };
 
   if (text->sections == NULL || text->section_count_max == text->section_count) {
-    text->sections = realloc(text->sections,(size_t)(text->section_count + 1) * sizeof(TextSection_s));
+    text->sections = safe_realloc(text->sections,(size_t)(text->section_count + 1) * sizeof(TextSection_s));
     text->section_count_max++;
   }
   text->sections[(text->section_count)++] = section;
 
   if (text->section_count_max - text->section_count > DOWNSIZING_THRESHOLD) {
-    text->sections = realloc(text->sections, (text->section_count) * sizeof(TextSection_s));
+    text->sections = safe_realloc(text->sections, (text->section_count) * sizeof(TextSection_s));
   }
 }
 
@@ -455,8 +454,8 @@ static void clear_sections(MeowhudState *state) {
 }
 
 static void append_frame_line(MeowhudState *state, const char *line) {
-  FrameLineNode_s *node = malloc(sizeof(FrameLineNode_s));
-  node->line = strdup(line);
+  FrameLineNode_s *node = safe_malloc(sizeof(FrameLineNode_s));
+  node->line = safe_strdup(line);
   node->next = NULL;
 
   if (!state->frame_lines_head) {

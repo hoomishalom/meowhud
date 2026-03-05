@@ -1,4 +1,5 @@
 #include "../include/draw.h"
+#include "../include/utils.h"
 
 static void render_glyphs(
   pixman_image_t *result,
@@ -49,8 +50,7 @@ void render_chars(
   struct fcft_font *font
 ) {
   if (text_len == 0) return;
-  const struct fcft_glyph **glyphs = malloc(text_len * sizeof(struct fcft_glyph *));
-  if (!glyphs) return;
+  const struct fcft_glyph **glyphs = safe_malloc(text_len * sizeof(const struct fcft_glyph *));
 
   int text_width = 0;
   int avail_width = anchor_right ? *x : (surface_width - *x);

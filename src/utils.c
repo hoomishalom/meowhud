@@ -1,6 +1,8 @@
 #include "../include/utils.h"
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 bool parse_uint32(const char *str, uint32_t *out, int base) {
   if (!str || *str == '\0') return false;
@@ -30,4 +32,32 @@ bool parse_uint64(const char *str, uint64_t *out, int base) {
   if (errno != 0 || *endptr != '\0') return false;
   *out = (uint64_t)val;
   return true;
+}
+
+void *safe_malloc(size_t size) {
+  void *ptr = malloc(size);
+  if (!ptr && size > 0) {
+    fprintf(stderr, "Fatal: failed to allocate %zu bytes\n", size);
+    exit(EXIT_FAILURE);
+  }
+  return ptr;
+}
+
+void *safe_realloc(void *ptr, size_t size) {
+  void *new_ptr = realloc(ptr, size);
+  if (!new_ptr && size > 0) {
+    fprintf(stderr, "Fatal: failed to reallocate %zu bytes\n", size);
+    exit(EXIT_FAILURE);
+  }
+  return new_ptr;
+}
+
+char *safe_strdup(const char *s) {
+  if (!s) return NULL;
+  char *new_s = strdup(s);
+  if (!new_s) {
+    fprintf(stderr, "Fatal: failed to duplicate string\n");
+    exit(EXIT_FAILURE);
+  }
+  return new_s;
 }
