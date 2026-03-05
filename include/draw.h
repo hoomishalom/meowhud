@@ -4,6 +4,7 @@
 #include <uchar.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <fcft/fcft.h>
 #include <wayland-client.h>

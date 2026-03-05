@@ -55,18 +55,28 @@ static void init_rows(Row_s ***rows, size_t row_count) {
 }
 
 static void free_rows(Row_s **rows, size_t row_count) {
+  if (!rows) return;
   for (size_t i = 0; i < row_count; i++) {
     Row_s *curr_row = rows[i];
+    if (!curr_row) continue;
 
-    for (size_t j = 0; j < curr_row->left->section_count; j++) {
-      free(curr_row->left->sections[j].text);
+    if (curr_row->left) {
+      for (size_t j = 0; j < curr_row->left->section_count; j++) {
+        if (curr_row->left->sections[j].text) free(curr_row->left->sections[j].text);
+        if (curr_row->left->sections[j].color) pixman_image_unref(curr_row->left->sections[j].color);
+      }
+      if (curr_row->left->sections) free(curr_row->left->sections);
+      free(curr_row->left);
     }
-    free(curr_row->left->sections);
 
-    for (size_t j = 0; j < curr_row->right->section_count; j++) {
-      free(curr_row->right->sections[j].text);
+    if (curr_row->right) {
+      for (size_t j = 0; j < curr_row->right->section_count; j++) {
+        if (curr_row->right->sections[j].text) free(curr_row->right->sections[j].text);
+        if (curr_row->right->sections[j].color) pixman_image_unref(curr_row->right->sections[j].color);
+      }
+      if (curr_row->right->sections) free(curr_row->right->sections);
+      free(curr_row->right);
     }
-    free(curr_row->right->sections);
 
     free(curr_row);
   }
@@ -412,7 +422,7 @@ static void handle_frame_line(MeowhudState *state, char *line) {
 static void clear_sections(MeowhudState *state) {
   for (size_t i = 0; i < state->row_count; i++) {
     Row_s *curr_row = state->content_rows[i];
-    for (size_t j = 0; i < curr_row->left->section_count; i++) {
+    for (size_t j = 0; j < curr_row->left->section_count; j++) {
       TextSection_s curr_section = curr_row->left->sections[j];
 
       if (curr_section.text != NULL) {
@@ -427,7 +437,7 @@ static void clear_sections(MeowhudState *state) {
     } 
     curr_row->left->section_count = 0;
 
-    for (size_t j = 0; i < curr_row->right->section_count; i++) {
+    for (size_t j = 0; j < curr_row->right->section_count; j++) {
       TextSection_s curr_section = curr_row->right->sections[j];
 
       if (curr_section.text != NULL) {

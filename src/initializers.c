@@ -135,3 +135,82 @@ void init_buffer(MeowhudState *state) {
 
   wl_buffer_add_listener(state->buff, &buffer_listener, state);
 }
+
+void cleanup_state(MeowhudState *state) {
+  if (!state) return;
+
+  // 1. Free Frame Lines (Linked List)
+  FrameLineNode_s *curr_node = state->frame_lines_head;
+  while (curr_node) {
+    FrameLineNode_s *next = curr_node->next;
+    free(curr_node->line);
+    free(curr_node);
+    curr_node = next;
+  }
+
+  // 2. Free Content Rows
+  if (state->content_rows) {
+    for (uint32_t i = 0; i < state->row_count; i++) {
+      Row_s *row = state->content_rows[i];
+      if (!row) continue;
+
+      if (row->left) {
+        for (uint32_t j = 0; j < row->left->section_count; j++) {
+          if (row->left->sections[j].text) {
+            free(row->left->sections[j].text);
+          }
+          if (row->left->sections[j].color) {
+            pixman_image_unref(row->left->sections[j].color);
+          }
+        }
+        if (row->left->sections) free(row->left->sections);
+        free(row->left);
+      }
+
+      if (row->right) {
+        for (uint32_t j = 0; j < row->right->section_count; j++) {
+          if (row->right->sections[j].text) {
+            free(row->right->sections[j].text);
+          }
+          if (row->right->sections[j].color) {
+            pixman_image_unref(row->right->sections[j].color);
+          }
+        }
+        if (row->right->sections) free(row->right->sections);
+        free(row->right);
+      }
+      free(row);
+    }
+    free(state->content_rows);
+  }
+
+  // 3. Free Fonts
+  if (state->font) fcft_destroy(state->font);
+  if (state->font_names) {
+    for (uint32_t i = 0; i < state->font_count; i++) {
+      free(state->font_names[i]);
+    }
+    free(state->font_names);
+  }
+
+  // 4. Free General Colors & Images
+  if (state->bg_color) pixman_image_unref(state->bg_color);
+  if (state->default_text_color) pixman_image_unref(state->default_text_color);
+  if (state->pix_img) pixman_image_unref(state->pix_img);
+
+  // 5. Free Shared Memory & File Descriptor
+  if (state->mmapped) munmap(state->mmapped, state->shm_size);
+  if (state->fd >= 0) close(state->fd);
+
+  // 6. Free Wayland Protocol Objects (In reverse order of creation)
+  if (state->layer) zwlr_layer_surface_v1_destroy(state->layer);
+  if (state->surface) wl_surface_destroy(state->surface);
+  if (state->buff) wl_buffer_destroy(state->buff);
+  if (state->shm_pool) wl_shm_pool_destroy(state->shm_pool);
+  if (state->layer_shell) zwlr_layer_shell_v1_destroy(state->layer_shell);
+  if (state->shm) wl_shm_destroy(state->shm);
+  if (state->compositor) wl_compositor_destroy(state->compositor);
+  if (state->registry) wl_registry_destroy(state->registry);
+  if (state->display) wl_display_disconnect(state->display);
+}
+

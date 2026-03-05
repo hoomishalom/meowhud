@@ -48,7 +48,10 @@ void render_chars(
   pixman_image_t *color,
   struct fcft_font *font
 ) {
-  const struct fcft_glyph *glyphs[text_len];
+  if (text_len == 0) return;
+  const struct fcft_glyph **glyphs = malloc(text_len * sizeof(struct fcft_glyph *));
+  if (!glyphs) return;
+
   int text_width = 0;
   int avail_width = anchor_right ? *x : (surface_width - *x);
 
@@ -67,6 +70,7 @@ void render_chars(
   }
 
   render_glyphs(result, x, &y, anchor_right, color, text_len, font, glyphs);
+  free(glyphs);
 }
 
 void render_rows(MeowhudState *state) {
