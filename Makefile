@@ -20,5 +20,15 @@ $(OBJFILES): $(BUILDDIR)%.o: $(SRCDIR)%.c
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
+test: test_utils
+	./test_utils
+
+test_utils: $(BUILDDIR)tests/test_utils.o $(BUILDDIR)utils.o
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(BUILDDIR)tests/test_utils.o: tests/test_utils.c
+	mkdir -p $(BUILDDIR)tests
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	rm -rf $(BUILDDIR) $(EXEC) 
+	rm -rf $(BUILDDIR) $(EXEC) test_utils 

@@ -1,0 +1,30 @@
+name: Build and Test meowhud
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc make libwayland-dev libpixman-1-dev pkg-config
+        
+        # Install fcft (Requires manual setup on Ubuntu as it's not in default repos, or we use a pre-built package/flake if available)
+        # Note: Since fcft is a specific requirement, we might need a workaround for Ubuntu CI.
+        # Let's try to install its dependencies and build it if necessary, or use a PPA if one exists.
+        # For simplicity in this initial workflow, we'll try to use standard packages that might provide it, 
+        # but realistically you might need a more complex setup script here if fcft is not easily available.
+        # For now, let's assume we can compile the tests without fcft since utils doesn't depend on it!
+        
+    - name: Run Tests
+      # We only compile the test binary to avoid full Wayland/fcft linking issues in this basic CI container
+      run: make test
