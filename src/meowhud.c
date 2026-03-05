@@ -1,5 +1,5 @@
 #include "../include/meowhud.h"
-
+#include <fcntl.h>
 
 int main(int argc, char *argv[]) {
   fcft_init(FCFT_LOG_COLORIZE_NEVER, false, FCFT_LOG_CLASS_NONE);
@@ -8,6 +8,10 @@ int main(int argc, char *argv[]) {
   init_state(&state);
 
   parse_options(&state);
+
+  // Set stdin to non-blocking mode for frame reading
+  int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 
   init_hud(&state);
 
@@ -31,12 +35,12 @@ int main(int argc, char *argv[]) {
       // poll stdin
       if (pfds[0].revents & POLLIN) { // will be zero if POLLIN isnt one
         if (state.configured) {
-          parse_frame(&state);
+          if (parse_frame(&state)) {
+            render_bg(&state);
+            render_rows(&state);
 
-          render_bg(&state);
-          render_rows(&state);
-
-          draw_hud(&state);
+            draw_hud(&state);
+          }
         }
         pfds[0].events = POLLIN; // safer this way
       } else if (pfds[0].revents & POLLHUP) {

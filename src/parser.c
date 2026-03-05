@@ -3,6 +3,7 @@
 #include "types.h"
 #include <errno.h>
 #include <stdint.h>
+#include <unistd.h>
 #include "../include/utils.h"
 
 extern int errno;
@@ -443,20 +444,93 @@ static void clear_sections(MeowhudState *state) {
   }
 }
 
-void parse_frame(MeowhudState *state) {
-  char *line = NULL;
-  size_t length = 0;
+static void append_frame_line(MeowhudState *state, const char *line) {
+  FrameLineNode_s *node = malloc(sizeof(FrameLineNode_s));
+  node->line = strdup(line);
+  node->next = NULL;
 
-  clear_sections(state); // clears sections for the next frame
-  while (getline(&line, &length, stdin) != -1) {
-    char *new_line = strchr(line, '\n'); // removes new line
-    if (new_line) *new_line = '\0';
+  if (!state->frame_lines_head) {
+    state->frame_lines_head = node;
+    state->frame_lines_tail = node;
+  } else {
+    state->frame_lines_tail->next = node;
+    state->frame_lines_tail = node;
+  }
+}
 
-    if (strcmp(line, DONE_MARKER) == 0)
-      break;
+static void free_frame_lines(MeowhudState *state) {
+  FrameLineNode_s *curr = state->frame_lines_head;
+  while (curr) {
+    FrameLineNode_s *next = curr->next;
+    free(curr->line);
+    free(curr);
+    curr = next;
+  }
+  state->frame_lines_head = NULL;
+  state->frame_lines_tail = NULL;
+}
 
-    handle_frame_line(state, line);
+bool parse_frame(MeowhudState *state) {
+  char temp_buf[1024];
+  ssize_t bytes_read;
+  bool frame_ready = false;
+
+  // Read non-blockingly until EAGAIN or EOF
+  while ((bytes_read = read(STDIN_FILENO, temp_buf, sizeof(temp_buf))) > 0) {
+    // Ensure we don't overflow the persistent buffer
+    if (state->stdin_buffer_len + bytes_read > sizeof(state->stdin_buffer) - 1) {
+      fprintf(stderr, "stdin buffer overflow, dropping data\n");
+      state->stdin_buffer_len = 0; // simplistic recovery
+      continue;
+    }
+
+    memcpy(state->stdin_buffer + state->stdin_buffer_len, temp_buf, bytes_read);
+    state->stdin_buffer_len += bytes_read;
+    state->stdin_buffer[state->stdin_buffer_len] = '\0';
+
+    // Parse out complete lines separated by '\n'
+    char *newline_pos;
+    while ((newline_pos = strchr(state->stdin_buffer, '\n')) != NULL) {
+      *newline_pos = '\0'; // Null-terminate the line
+
+      // Strip optional \r for Windows line endings compatibility
+      char *cr_pos = strchr(state->stdin_buffer, '\r');
+      if (cr_pos) *cr_pos = '\0';
+
+      if (strcmp(state->stdin_buffer, DONE_MARKER) == 0) {
+        frame_ready = true;
+      } else {
+        append_frame_line(state, state->stdin_buffer);
+      }
+
+      // Shift the remaining buffer down
+      size_t line_len = (newline_pos - state->stdin_buffer) + 1;
+      size_t remaining_len = state->stdin_buffer_len - line_len;
+      memmove(state->stdin_buffer, newline_pos + 1, remaining_len);
+      state->stdin_buffer_len = remaining_len;
+      state->stdin_buffer[state->stdin_buffer_len] = '\0';
+    }
   }
 
-  free(line);
+  // If we received EOF, stdin closed
+  if (bytes_read == 0) {
+    state->running = false;
+  }
+
+  if (frame_ready) {
+    clear_sections(state); // clears sections for the next frame
+
+    // Apply all buffered lines to the new frame
+    FrameLineNode_s *curr = state->frame_lines_head;
+    while (curr) {
+      // handle_frame_line uses strsep and modifies the string, but curr->line is strdup'd so it's safe.
+      handle_frame_line(state, curr->line);
+      curr = curr->next;
+    }
+
+    free_frame_lines(state);
+    return true;
+  }
+
+  return false;
 }

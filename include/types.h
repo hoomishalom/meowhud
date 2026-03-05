@@ -23,6 +23,11 @@ typedef struct {
   Text_s *right;
 } Row_s;
 
+typedef struct FrameLineNode {
+  char *line;
+  struct FrameLineNode *next;
+} FrameLineNode_s;
+
 typedef struct meowhud_state {
   // Wayland Globals
   struct wl_compositor *compositor;
@@ -46,6 +51,12 @@ typedef struct meowhud_state {
   // State Flags
   bool configured;
   bool running;
+
+  // Non-blocking I/O state
+  char stdin_buffer[4096];
+  size_t stdin_buffer_len;
+  FrameLineNode_s *frame_lines_head;
+  FrameLineNode_s *frame_lines_tail;
 
   // Surface Config 
   uint32_t width;

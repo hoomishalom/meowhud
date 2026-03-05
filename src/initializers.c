@@ -25,6 +25,11 @@ void init_state(MeowhudState *state) {
   state->configured = false;
   state->running = true;
 
+  // Non-blocking I/O state
+  state->stdin_buffer_len = 0;
+  state->frame_lines_head = NULL;
+  state->frame_lines_tail = NULL;
+
   // Surface config
   state->height = 0;
   state->width = 0;

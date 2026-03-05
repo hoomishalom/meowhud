@@ -27,7 +27,7 @@ uint32_t pixman_compute_stride(pixman_format_code_t format, int width);
 
 void parse_options(MeowhudState *state);
 
-void parse_frame(MeowhudState *state);
+bool parse_frame(MeowhudState *state);
 
 #endif
 
