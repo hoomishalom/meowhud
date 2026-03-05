@@ -3,6 +3,7 @@
 #include "types.h"
 #include <errno.h>
 #include <stdint.h>
+#include "../include/utils.h"
 
 extern int errno;
 
@@ -14,7 +15,12 @@ uint32_t pixman_compute_stride(pixman_format_code_t format, int width)
 }
 
 static pixman_color_t get_color_8_to_16(char *color_string){ 
-  uint32_t raw_color = strtoul(color_string, NULL, 16); // 16 for hex
+  uint32_t raw_color = 0;
+  if (color_string && *color_string != '\0') {
+    if (!parse_uint32(color_string, &raw_color, 16)) {
+      fprintf(stderr, "Failed to parse color string: %s\n", color_string);
+    }
+  }
   pixman_color_t color;
 
   // puts parts of raw_color and places it in the right place, and
@@ -120,11 +126,11 @@ static void handle_options_line(char *line,
   char *value = strsep(&line, DELIMITER);
 
   if (strcmp(option, "font_count_max") == 0) {
-    uint32_t font_count_max = atoi(value);
+    uint32_t font_count_max;
 
-    if (font_count_max <= 0) {
-      fprintf(stderr, "font_count is too small (is: %d, min: %d)\n",
-              font_count_max, 0);
+    if (!parse_uint32(value, &font_count_max, 10) || font_count_max <= 0) {
+      fprintf(stderr, "font_count is too small or invalid (is: %s, min: %d)\n",
+              value, 0);
       return;
     }
 
@@ -150,7 +156,12 @@ static void handle_options_line(char *line,
     strcpy(state->font_names[state->font_count], value);
     (state->font_count)++;
   } else if (strcmp(option, "width") == 0) {
-    int32_t width = atoi(value);
+    int32_t width;
+
+    if (!parse_int32(value, &width, 10)) {
+      fprintf(stderr, "invalid width (is: %s)\n", value);
+      return;
+    }
 
     if (width <= 0 && strcmp(value, "0") != 0) {
       fprintf(stderr, "invalid width (is: %s)\n", value);
@@ -159,7 +170,12 @@ static void handle_options_line(char *line,
 
     state->width = (uint32_t) width;
   } else if (strcmp(option, "height") == 0) {
-    int32_t height = atoi(value);
+    int32_t height;
+
+    if (!parse_int32(value, &height, 10)) {
+      fprintf(stderr, "invalid height (is %s)\n", value);
+      return;
+    }
 
     if (height <= 0) {
       if (strcmp(value, "0") == 0) {
@@ -173,12 +189,12 @@ static void handle_options_line(char *line,
 
     state->height = (uint32_t) height;
   } else if (strcmp(option, "row_count") == 0) { // TODO: doesnt allocate space
-    uint32_t row_count = atoi(value);
+    uint32_t row_count;
 
-    if (row_count <= 0) {
+    if (!parse_uint32(value, &row_count, 10) || row_count <= 0) {
       fprintf( stderr,
-              "row_count is too small or an error has occurred (is: %d, min: %d)\n",
-              row_count, 0);
+              "row_count is too small or invalid (is: %s, min: %d)\n",
+              value, 0);
       return;
     }
 
@@ -217,11 +233,16 @@ static void handle_options_line(char *line,
       return;
     }
 
-    state->anchor = strtoull(value, NULL, 2);
+    uint64_t anchor;
+    if (!parse_uint64(value, &anchor, 2)) {
+      fprintf(stderr, "invalid anchor (is: %s)\n", value);
+      return;
+    }
+    state->anchor = (uint32_t)anchor;
   } else if (strcmp(option, "row_spacing") == 0) {
-    uint32_t row_spacing = strtoul(value, NULL, 10); 
+    uint32_t row_spacing;
 
-    if (row_spacing == 0) {
+    if (!parse_uint32(value, &row_spacing, 10) || row_spacing == 0) {
       fprintf(stderr, "row_spacing produced an error, must be positive integer\n");
       return;
     }
@@ -267,10 +288,11 @@ static bool verify_frame_values(MeowhudState *state, char *line_num, char *align
     return false; // no need to check the rest of the conditions
   }
 
-  if (atoi(line_num) == 0) { // line_num is 0 or not a number, both are not valid
+  uint32_t parsed_line_num;
+  if (!parse_uint32(line_num, &parsed_line_num, 10) || parsed_line_num == 0) { // line_num is 0 or not a number, both are not valid
     fprintf(stderr, "Bad line number (is: %s)\n", line_num);
     valid = false;
-  } else if ((uint32_t) atoi(line_num) > (state->row_count)) {
+  } else if (parsed_line_num > state->row_count) {
     fprintf(stderr, "line number is too big (is: %s, max: %u)\n", line_num, state->row_count);
     valid = false;
   }
@@ -368,7 +390,8 @@ static void handle_frame_line(MeowhudState *state, char *line) {
 
   if (!valid) return;
 
-  uint32_t line_num = atoi(line_num_str);
+  uint32_t line_num;
+  parse_uint32(line_num_str, &line_num, 10);
 
   pixman_image_t *color;
   pixman_color_t temp_color = get_color_8_to_16(color_str);
