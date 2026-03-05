@@ -41,7 +41,7 @@ DONE
 #### Font
 
 * `font_count_max`: (Required) An upper bound on the amount of fonts that will be given.
-* `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute2=value1:attribute1=value2:...`.
+* `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute1=value1:attribute2=value2:...`.
 * `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB`.
 
 #### Window
