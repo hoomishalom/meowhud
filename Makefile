@@ -1,6 +1,7 @@
 CC := gcc
 CFLAGS := -ggdb -O0 -Wall -Wextra -I./include -DWLR_USE_UNSTABLE $(shell pkg-config --cflags fcft) $(shell pkg-config --cflags pixman-1)
 LDFLAGS := -lwayland-client  -lfcft $(shell pkg-config --libs pixman-1)
+TEST_LDFLAGS := $(shell pkg-config --libs pixman-1)
 EXEC := meowhud 
 SRCDIR := ./src/
 BUILDDIR := ./build/
@@ -8,6 +9,7 @@ SRCFILES := $(wildcard $(SRCDIR)*.c)
 OBJFILES := $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES)) # generates obj files
 
 #.SILENT:
+
 
 all: $(BUILDDIR) $(EXEC)
 
@@ -24,7 +26,7 @@ test: test_utils
 	./test_utils
 
 test_utils: $(BUILDDIR)tests/test_utils.o $(BUILDDIR)utils.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(TEST_LDFLAGS)
 
 $(BUILDDIR)tests/test_utils.o: tests/test_utils.c
 	mkdir -p $(BUILDDIR)tests
