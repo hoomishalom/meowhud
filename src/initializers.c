@@ -3,6 +3,7 @@
 #include "../include/parser.h"
 #include "../include/listeners.h"
 #include "../include/types.h"
+#include "../include/utils.h"
 #include "wlr-layer-shell-unstable-v1-protocol.h"
 
 #include <sys/mman.h>
@@ -72,7 +73,7 @@ static void get_and_configure_layer(MeowhudState *state) {
   state->layer = zwlr_layer_shell_v1_get_layer_surface(
     state->layer_shell,
     state->surface,
-    NULL,
+    NULL, // TODO: this determines the output, add an option to choose which outputs to use
     ZWLR_LAYER_SHELL_V1_LAYER_OVERLAY,
     ""
   );
@@ -165,38 +166,8 @@ void cleanup_state(MeowhudState *state) {
 
   // 2. Free Content Rows
   if (state->content_rows) {
-    for (uint32_t i = 0; i < state->row_count; i++) {
-      Row_s *row = state->content_rows[i];
-      if (!row) continue;
-
-      if (row->left) {
-        for (uint32_t j = 0; j < row->left->section_count; j++) {
-          if (row->left->sections[j].text) {
-            free(row->left->sections[j].text);
-          }
-          if (row->left->sections[j].color) {
-            pixman_image_unref(row->left->sections[j].color);
-          }
-        }
-        if (row->left->sections) free(row->left->sections);
-        free(row->left);
-      }
-
-      if (row->right) {
-        for (uint32_t j = 0; j < row->right->section_count; j++) {
-          if (row->right->sections[j].text) {
-            free(row->right->sections[j].text);
-          }
-          if (row->right->sections[j].color) {
-            pixman_image_unref(row->right->sections[j].color);
-          }
-        }
-        if (row->right->sections) free(row->right->sections);
-        free(row->right);
-      }
-      free(row);
-    }
-    free(state->content_rows);
+    free_rows(state->content_rows, state->row_count);
+    state->content_rows = NULL;
   }
 
   // 3. Free Fonts
