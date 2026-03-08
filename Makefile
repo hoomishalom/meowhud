@@ -1,6 +1,6 @@
 CC := gcc
-CFLAGS := -ggdb -O0 -Wall -Wextra -I./include -DWLR_USE_UNSTABLE $(shell pkg-config --cflags fcft) $(shell pkg-config --cflags --libs pixman-1)
-LDFLAGS := -lwayland-client  -lfcft
+CFLAGS := -ggdb -O0 -Wall -Wextra -I./include -DWLR_USE_UNSTABLE $(shell pkg-config --cflags fcft) $(shell pkg-config --cflags pixman-1)
+LDFLAGS := -lwayland-client  -lfcft $(shell pkg-config --libs pixman-1)
 EXEC := meowhud 
 SRCDIR := ./src/
 BUILDDIR := ./build/
@@ -24,7 +24,7 @@ test: test_utils
 	./test_utils
 
 test_utils: $(BUILDDIR)tests/test_utils.o $(BUILDDIR)utils.o
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BUILDDIR)tests/test_utils.o: tests/test_utils.c
 	mkdir -p $(BUILDDIR)tests
