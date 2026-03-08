@@ -19,6 +19,9 @@ void init_state(MeowhudState *state) {
   state->compositor = NULL;
   state->layer_shell = NULL;
   state->shm = NULL;
+  
+  state->outputs = NULL;
+  state->output_count = 0;
 
   state->display = NULL;
   state->registry = NULL;
@@ -132,7 +135,7 @@ void init_buffer(MeowhudState *state) {
   if (state->buff != NULL) wl_buffer_destroy(state->buff);
   state->buff = wl_shm_pool_create_buffer(state->shm_pool, 0, state->width, state->height, state->stride, WL_SHM_FORMAT_ARGB8888);
 
-  /* We use the entire pool for our single buffer */
+  // We use the entire pool for our single buffer 
   wl_shm_pool_destroy(state->shm_pool);
   state->shm_pool = NULL;
   close(state->fd);
@@ -155,7 +158,7 @@ void init_buffer(MeowhudState *state) {
 void cleanup_state(MeowhudState *state) {
   if (!state) return;
 
-  // 1. Free Frame Lines (Linked List)
+  // Free Frame Lines (Linked List)
   FrameLineNode_s *curr_node = state->frame_lines_head;
   while (curr_node) {
     FrameLineNode_s *next = curr_node->next;
@@ -164,13 +167,13 @@ void cleanup_state(MeowhudState *state) {
     curr_node = next;
   }
 
-  // 2. Free Content Rows
+  // Free Content Rows
   if (state->content_rows) {
     free_rows(state->content_rows, state->row_count);
     state->content_rows = NULL;
   }
 
-  // 3. Free Fonts
+  // Free Fonts
   if (state->font) fcft_destroy(state->font);
   if (state->font_names) {
     for (uint32_t i = 0; i < state->font_count; i++) {
@@ -179,7 +182,7 @@ void cleanup_state(MeowhudState *state) {
     free(state->font_names);
   }
 
-  // 4. Free General Colors & Images
+  // Free General Colors & Images
   if (state->bg_color) pixman_image_unref(state->bg_color);
   if (state->default_text_color) pixman_image_unref(state->default_text_color);
   if (state->pix_img) pixman_image_unref(state->pix_img);
@@ -188,7 +191,17 @@ void cleanup_state(MeowhudState *state) {
   if (state->mmapped) munmap(state->mmapped, state->shm_size);
   if (state->fd >= 0) close(state->fd);
 
-  // 6. Free Wayland Protocol Objects (In reverse order of creation)
+  // Free Output Tracking
+  if (state->outputs) {
+    for (size_t i = 0; i < state->output_count; i++) {
+      if (state->outputs[i].wl_output) {
+        wl_output_destroy(state->outputs[i].wl_output);
+      }
+    }
+    free(state->outputs);
+  }
+
+  // Free Wayland Protocol Objects (In reverse order of creation)
   if (state->layer) zwlr_layer_surface_v1_destroy(state->layer);
   if (state->surface) wl_surface_destroy(state->surface);
   if (state->buff) wl_buffer_destroy(state->buff);
