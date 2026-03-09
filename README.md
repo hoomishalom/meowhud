@@ -49,7 +49,7 @@ DONE
 
 * `font_count_max`: (Required) An upper bound on the amount of fonts that will be given.
 * `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute1=value1:attribute2=value2:...`.
-* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB` (Hexadecimal).
+* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB` (Hex).
 
 #### Window
 
@@ -57,17 +57,17 @@ DONE
 * `height`: The height of the window (if not given, height
 will be calcualted to allow exactly `row_count` rows).
 * `row_count`: (Required) The amount of row that will be used.
-* `bg_color`: (Required) The color of the background, format: `AARRGGBB` (Hexadecimal).
+* `bg_color`: (Required) The color of the background, format: `AARRGGBB` (Hex).
 * `anchor`: (Required) Anchoring bit mask in binary format `right|left|bottom|top`. 
-    * `1000` = Right (8)
-    * `0100` = Left (4)
-    * `0010` = Bottom (2)
-    * `0001` = Top (1)
+    * `1000` = Right
+    * `0100` = Left
+    * `0010` = Bottom
+    * `0001` = Top
     * Examples: `1101` (Top + Left + Right), `0011` (Top + Bottom).
 * `target_output`: Defines which monitor(s) to display the HUD on. 
     * `main`: (Default) Shows on the active/focused monitor.
     * `all`: Shows the HUD on all connected monitors simultaneously.
-    * `[name1],[name2]`: Comma-separated list of exact monitor names (e.g., `DP-1,HDMI-A-1`).
+    * `[name1],[name2]`: Comma-separated list of exact monitor names (`DP-1,HDMI-A-1`).
 
 ## Frames
 
