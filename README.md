@@ -2,7 +2,7 @@ A simple Wayland status HUD, inspired by [bread](https://github.com/netfri25/bre
 
 # Usage
 Needs a "content creator", a program that makes the frames
-and defines the [options](optoins).
+and defines the [options](#options).
 
 ```
 content_creator | meowhud
@@ -11,6 +11,12 @@ content_creator | meowhud
 In addition, can be used manually by just running ```meowhud```,
 this is one of the design motiviations behind the final
 protocol.
+
+# Build
+To build the project, ensure you have the dependencies installed and run:
+```bash
+make
+```
 
 # Dependencies
 All dependencies that are not "easily" installed are
@@ -33,6 +39,7 @@ bg_color;80e53939
 row_count;5
 anchor;1101
 row_spacing;20
+target_output;all
 DONE
 ```
 
@@ -42,7 +49,7 @@ DONE
 
 * `font_count_max`: (Required) An upper bound on the amount of fonts that will be given.
 * `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute1=value1:attribute2=value2:...`.
-* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB`.
+* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB` (Hexadecimal).
 
 #### Window
 
@@ -50,8 +57,17 @@ DONE
 * `height`: The height of the window (if not given, height
 will be calcualted to allow exactly `row_count` rows).
 * `row_count`: (Required) The amount of row that will be used.
-* `bg_color`: (Required) The color of the background, format: `AARRGGBB`.
-* `anchor`: (Required) Anchoring bit mask `right||left||bottom||top` (all 0's for centered, example: top-right `1001`).
+* `bg_color`: (Required) The color of the background, format: `AARRGGBB` (Hexadecimal).
+* `anchor`: (Required) Anchoring bit mask in binary format `right|left|bottom|top`. 
+    * `1000` = Right (8)
+    * `0100` = Left (4)
+    * `0010` = Bottom (2)
+    * `0001` = Top (1)
+    * Examples: `1101` (Top + Left + Right), `0011` (Top + Bottom).
+* `target_output`: Defines which monitor(s) to display the HUD on. 
+    * `main`: (Default) Shows on the active/focused monitor.
+    * `all`: Shows the HUD on all connected monitors simultaneously.
+    * `[name1],[name2]`: Comma-separated list of exact monitor names (e.g., `DP-1,HDMI-A-1`).
 
 ## Frames
 
