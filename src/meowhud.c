@@ -11,7 +11,6 @@
 #include <errno.h>
 
 #include <fcft/fcft.h>
-#include <locale.h>
 
 #include <wayland-client.h>
 #include <wlr/types/wlr_layer_shell_v1.h>
@@ -54,7 +53,6 @@ int main(int argc, char *argv[]) {
   init_hud(&state);
 
   wl_display_roundtrip(state.display);
-  wl_surface_commit(state.surface);
 
   struct pollfd poll_stdin;
   poll_stdin.fd = STDIN_FILENO;
@@ -74,12 +72,14 @@ int main(int argc, char *argv[]) {
     if (ret > 0) {
       // poll stdin
       if (pfds[0].revents & POLLIN) { // will be zero if POLLIN isnt one
-        if (state.configured) {
-          if (parse_frame(&state)) {
-            render_bg(&state);
-            render_rows(&state);
-
-            draw_hud(&state);
+        if (parse_frame(&state)) {
+          for (size_t i = 0; i < state.hud_count; i++) {
+            OutputState *hud = &state.huds[i];
+            if (hud->configured && hud->surface) {
+              render_bg(hud);
+              render_rows(hud);
+              draw_hud(hud);
+            }
           }
         }
         pfds[0].events = POLLIN; // safer this way

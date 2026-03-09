@@ -101,26 +101,26 @@ static uint32_t utf8_to_char32(char *src, char32_t **dest) {
   return out_i;
 }
 
-static void add_section_to_text(Text_s *text, char *data, pixman_image_t *color) {
+static void add_section_to_text(Text *text, char *data, pixman_image_t *color) {
   char32_t *data_32;
   uint32_t len = utf8_to_char32(data, &data_32);
 
   if (len == 0) return;
 
-  TextSection_s section = {
+  TextSection section = {
     .text = data_32,
     .len = len,
     .color = color
   };
 
   if (text->sections == NULL || text->section_count_max == text->section_count) {
-    text->sections = safe_realloc(text->sections,(size_t)(text->section_count + 1) * sizeof(TextSection_s));
+    text->sections = safe_realloc(text->sections,(size_t)(text->section_count + 1) * sizeof(TextSection));
     text->section_count_max++;
   }
   text->sections[(text->section_count)++] = section;
 
   if (text->section_count_max - text->section_count > DOWNSIZING_THRESHOLD) {
-    text->sections = safe_realloc(text->sections, (text->section_count) * sizeof(TextSection_s));
+    text->sections = safe_realloc(text->sections, (text->section_count) * sizeof(TextSection));
   }
 }
 
@@ -154,9 +154,9 @@ static void handle_frame_line(MeowhudState *state, char *line) {
 
 static void clear_sections(MeowhudState *state) {
   for (size_t i = 0; i < state->row_count; i++) {
-    Row_s *curr_row = state->content_rows[i];
+    Row *curr_row = state->content_rows[i];
     for (size_t j = 0; j < curr_row->left->section_count; j++) {
-      TextSection_s curr_section = curr_row->left->sections[j];
+      TextSection curr_section = curr_row->left->sections[j];
 
       if (curr_section.text != NULL) {
         free(curr_section.text);
@@ -171,7 +171,7 @@ static void clear_sections(MeowhudState *state) {
     curr_row->left->section_count = 0;
 
     for (size_t j = 0; j < curr_row->right->section_count; j++) {
-      TextSection_s curr_section = curr_row->right->sections[j];
+      TextSection curr_section = curr_row->right->sections[j];
 
       if (curr_section.text != NULL) {
         free(curr_section.text);
@@ -188,7 +188,7 @@ static void clear_sections(MeowhudState *state) {
 }
 
 static void append_frame_line(MeowhudState *state, const char *line) {
-  FrameLineNode_s *node = safe_malloc(sizeof(FrameLineNode_s));
+  FrameLineNode *node = safe_malloc(sizeof(FrameLineNode));
   node->line = safe_strdup(line);
   node->next = NULL;
 
@@ -202,9 +202,9 @@ static void append_frame_line(MeowhudState *state, const char *line) {
 }
 
 static void free_frame_lines(MeowhudState *state) {
-  FrameLineNode_s *curr = state->frame_lines_head;
+  FrameLineNode *curr = state->frame_lines_head;
   while (curr) {
-    FrameLineNode_s *next = curr->next;
+    FrameLineNode *next = curr->next;
     free(curr->line);
     free(curr);
     curr = next;
@@ -264,7 +264,7 @@ bool parse_frame(MeowhudState *state) {
     clear_sections(state); // clears sections for the next frame
 
     // Apply all buffered lines to the new frame
-    FrameLineNode_s *curr = state->frame_lines_head;
+    FrameLineNode *curr = state->frame_lines_head;
     while (curr) {
       // handle_frame_line uses strsep and modifies the string, but curr->line is strdup'd so it's safe.
       handle_frame_line(state, curr->line);

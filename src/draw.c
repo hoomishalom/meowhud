@@ -75,31 +75,32 @@ void render_chars(
   free(glyphs);
 }
 
-void render_rows(MeowhudState *state) {
-  Row_s **rows = state->content_rows;
+void render_rows(OutputState *hud) {
+  MeowhudState *state = hud->global_state;
+  Row **rows = state->content_rows;
   int y = 0;
   for (size_t i = 0; i < state->row_count; i++) {
-    Row_s *curr_row = rows[i];
+    Row *curr_row = rows[i];
     int left_x = 0;
-    int right_x = state->width;
+    int right_x = hud->width;
 
     if (!curr_row) {
       continue; 
     }
 
-    Text_s *curr_text;
+    Text *curr_text;
     // renders left part of row
     if ((curr_row->left) != NULL) {
       curr_text = curr_row->left;
       for (size_t j = 0; j < curr_row->left->section_count; j++) {
-        TextSection_s curr_section = curr_text->sections[j];
+        TextSection curr_section = curr_text->sections[j];
         if (curr_section.color != NULL) {
-          render_chars(curr_section.text, state->pix_img, curr_section.len,
-                       &left_x, y, state->width, false, curr_section.color,
+          render_chars(curr_section.text, hud->pix_img, curr_section.len,
+                       &left_x, y, hud->width, false, curr_section.color,
                        state->font);
         } else { // use default color
-          render_chars(curr_section.text, state->pix_img, curr_section.len,
-                       &left_x, y, state->width, false, state->default_text_color,
+          render_chars(curr_section.text, hud->pix_img, curr_section.len,
+                       &left_x, y, hud->width, false, state->default_text_color,
                        state->font);
         }
       }
@@ -109,14 +110,14 @@ void render_rows(MeowhudState *state) {
    if ((curr_row->right)) {
       curr_text = curr_row->right;
       for (size_t j = 0; j < curr_row->right->section_count; j++) {
-        TextSection_s curr_section = curr_text->sections[j];
+        TextSection curr_section = curr_text->sections[j];
         if (curr_section.color != NULL) { 
-          render_chars(curr_section.text, state->pix_img, curr_section.len,
-                       &right_x, y, state->width, true, curr_section.color,
+          render_chars(curr_section.text, hud->pix_img, curr_section.len,
+                       &right_x, y, hud->width, true, curr_section.color,
                        state->font);
         } else { // use default color
-          render_chars(curr_section.text, state->pix_img, curr_section.len,
-                       &right_x, y, state->width, true, state->default_text_color,
+          render_chars(curr_section.text, hud->pix_img, curr_section.len,
+                       &right_x, y, hud->width, true, state->default_text_color,
                        state->font);
         }
       }
@@ -127,16 +128,16 @@ void render_rows(MeowhudState *state) {
   }
 }
 
-void render_bg(MeowhudState *state) {
-  pixman_image_composite32(PIXMAN_OP_SRC, state->bg_color, NULL,
-                           state->pix_img, 0, 0, 0, 0, 0, 0, state->width,
-                           state->height);
+void render_bg(OutputState *hud) {
+  pixman_image_composite32(PIXMAN_OP_SRC, hud->global_state->bg_color, NULL,
+                           hud->pix_img, 0, 0, 0, 0, 0, 0, hud->width,
+                           hud->height);
 }
 
-void draw_hud(MeowhudState *state) {
-  wl_surface_attach(state->surface, state->buff, 0, 0);
-  wl_surface_damage(state->surface, 0, 0, state->width, state->height);
-  wl_surface_commit(state->surface);
-  wl_display_flush(state->display);
+void draw_hud(OutputState *hud) {
+  wl_surface_attach(hud->surface, hud->buff, 0, 0);
+  wl_surface_damage(hud->surface, 0, 0, hud->width, hud->height);
+  wl_surface_commit(hud->surface);
+  wl_display_flush(hud->global_state->display);
 }
 

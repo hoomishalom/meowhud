@@ -15,12 +15,12 @@ void render_chars(const char32_t *text, pixman_image_t *result, size_t text_len,
 
 
 // puts content_rows formatted on pix_img 
-void render_rows(MeowhudState *state);
+void render_rows(OutputState *hud);
  
 // puts bg on pix_img 
-void render_bg(MeowhudState *state);
+void render_bg(OutputState *hud);
 
 // draws pix_img to the surface
-void draw_hud(MeowhudState *state);
+void draw_hud(OutputState *hud);
 
 #endif

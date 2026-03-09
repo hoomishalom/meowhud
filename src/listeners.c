@@ -3,6 +3,7 @@
 #include "../include/initializers.h"
 #include "../include/utils.h"
 #include <string.h>
+#include <stdlib.h>
 
 static void output_handle_geometry(void *data, struct wl_output *wl_output,
                                    int32_t x, int32_t y, int32_t physical_width, 
@@ -17,10 +18,10 @@ static void output_handle_mode(void *data, struct wl_output *wl_output,
   (void)refresh;
   MeowhudState *state = data;
   if (flags & WL_OUTPUT_MODE_CURRENT) {
-    for (size_t i = 0; i < state->output_count; i++) {
-      if (state->outputs[i].wl_output == wl_output) {
-        state->outputs[i].width = width;
-        state->outputs[i].height = height;
+    for (size_t i = 0; i < state->hud_count; i++) {
+      if (state->huds[i].wl_output == wl_output) {
+        state->huds[i].monitor_width = width;
+        state->huds[i].monitor_height = height;
         break;
       }
     }
@@ -35,11 +36,28 @@ static void output_handle_scale(void *data, struct wl_output *wl_output, int32_t
   (void)data; (void)wl_output; (void)factor;
 }
 
+static void output_handle_name(void *data, struct wl_output *wl_output, const char *name) {
+  MeowhudState *state = data;
+  for (size_t i = 0; i < state->hud_count; i++) {
+    if (state->huds[i].wl_output == wl_output) {
+      if (state->huds[i].name) free(state->huds[i].name);
+      state->huds[i].name = safe_strdup(name);
+      break;
+    }
+  }
+}
+
+static void output_handle_description(void *data, struct wl_output *wl_output, const char *description) {
+  (void)data; (void)wl_output; (void)description;
+}
+
 const struct wl_output_listener output_listener = {
   .geometry = output_handle_geometry,
   .mode = output_handle_mode,
   .done = output_handle_done,
   .scale = output_handle_scale,
+  .name = output_handle_name,
+  .description = output_handle_description,
 };
 
 static void registry_handle_global(void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version)
@@ -54,26 +72,34 @@ static void registry_handle_global(void *data, struct wl_registry *registry, uin
   } else if (strcmp(interface, wl_shm_interface.name) == 0) {
     state->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
   } else if (strcmp(interface, wl_output_interface.name) == 0) {
-    state->output_count++;
-    state->outputs = safe_realloc(state->outputs, state->output_count * sizeof(Output_s));
+    state->hud_count++;
+    state->huds = safe_realloc(state->huds, state->hud_count * sizeof(OutputState));
     
-    Output_s *new_output = &state->outputs[state->output_count - 1];
-    new_output->wl_output = wl_registry_bind(registry, name, &wl_output_interface, 3);
-    new_output->width = 0;
-    new_output->height = 0;
+    OutputState *new_hud = &state->huds[state->hud_count - 1];
+    new_hud->global_state = state;
+    new_hud->wl_output = wl_registry_bind(registry, name, &wl_output_interface, 4); // Need version 4 for name event
+    new_hud->name = NULL;
+    new_hud->surface = NULL;
+    new_hud->layer = NULL;
+    new_hud->buff = NULL;
+    new_hud->shm_pool = NULL;
+    new_hud->mmapped = NULL;
+    new_hud->fd = -1;
+    new_hud->pix_img = NULL;
+    new_hud->configured = false;
+    new_hud->width = 0;
+    new_hud->height = 0;
+    new_hud->monitor_width = 0;
+    new_hud->monitor_height = 0;
     
-    wl_output_add_listener(new_output->wl_output, &output_listener, state);
+    wl_output_add_listener(new_hud->wl_output, &output_listener, state);
   }
-
-  // printf("interface: '%s', version: %d, name: %d\n", interface, version, name);
 }
 
 
 static void registry_handle_global_remove(void *data, struct wl_registry *registry, uint32_t name) {
   // This space deliberately left blank
-  (void)data; // Silence compiler warnings
-  (void)registry; // Silence compiler warnings
-  (void)name; // Silence compiler warnings
+  (void)data; (void)registry; (void)name; 
 }
 
 
@@ -85,23 +111,21 @@ const struct wl_registry_listener registry_listener = {
 static void handle_configure(void *data,
                              struct zwlr_layer_surface_v1 *layer_surface,
                              uint32_t serial, uint32_t width, uint32_t height) {
-  MeowhudState *state = data;
+  OutputState *hud = data;
 
   zwlr_layer_surface_v1_ack_configure(layer_surface, serial);
 
-  // instead of asserting that the width and height are the same, just comply to the compositor
-  state->width = width;
-  state->height = height;
+  hud->width = width;
+  hud->height = height;
 
-  state->configured = true;
+  hud->configured = true;
 
   // initialize the buffer with the new size
-  init_buffer(state);
+  init_buffer(hud);
 }
 
 static void handle_closed(void *data, struct zwlr_layer_surface_v1 *layer_surface) {
-  (void)data; // Silence compiler warnings
-  (void)layer_surface; // Silence compiler warnings
+  (void)data; (void)layer_surface;
 }
 
 const struct zwlr_layer_surface_v1_listener layer_surface_listener = {
@@ -110,8 +134,7 @@ const struct zwlr_layer_surface_v1_listener layer_surface_listener = {
 };
 
 static void handle_release(void *data, struct wl_buffer *buffer) {
-  (void)data; // Silence compiler warnings
-  (void)buffer; // Silence compiler warnings
+  (void)data; (void)buffer;
 }
 
 const struct wl_buffer_listener buffer_listener = {

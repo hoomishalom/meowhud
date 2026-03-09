@@ -7,7 +7,7 @@ void init_state(MeowhudState *state);
 
 void init_hud(MeowhudState *state);
 
-void init_buffer(MeowhudState *state);
+void init_buffer(OutputState *hud);
 
 void cleanup_state(MeowhudState *state);
 

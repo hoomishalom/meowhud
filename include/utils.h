@@ -16,7 +16,7 @@ void *safe_realloc(void *ptr, size_t size);
 char *safe_strdup(const char *s);
 
 pixman_color_t get_color_8_to_16(char *color_string);
-void init_rows(Row_s ***rows, size_t row_count);
-void free_rows(Row_s **rows, size_t row_count);
+void init_rows(Row ***rows, size_t row_count);
+void free_rows(Row **rows, size_t row_count);
 
 #endif

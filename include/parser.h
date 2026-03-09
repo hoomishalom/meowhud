@@ -16,7 +16,7 @@
 #define LENGTH_OF_ANCHOR 4
 
 // the minimum difference between the amount of allocated sections
-// and used sections in a Text_s
+// and used sections in a Text
 #define DOWNSIZING_THRESHOLD 10
 
 // calculates the appropriate stride value

@@ -53,7 +53,7 @@ static void handle_width(MeowhudState *state, const char *value) {
     fprintf(stderr, "invalid width (is: %s)\n", value);
     return;
   }
-  state->width = (uint32_t)width;
+  state->requested_width = (uint32_t)width;
 }
 
 static void handle_height(MeowhudState *state, const char *value) {
@@ -66,7 +66,7 @@ static void handle_height(MeowhudState *state, const char *value) {
     fprintf(stderr, "height can't be 0\n");
     return;
   }
-  state->height = (uint32_t)height;
+  state->requested_height = (uint32_t)height;
 }
 
 static void handle_row_count(MeowhudState *state, const char *value) {
@@ -122,6 +122,28 @@ static void handle_row_spacing(MeowhudState *state, const char *value) {
   state->row_spacing = row_spacing;
 }
 
+static void handle_target_output(MeowhudState *state, const char *value) {
+  if (strcmp(value, "main") == 0 || strlen(value) == 0) {
+    state->display_mode = HUD_DISPLAY_MODE_MAIN;
+  } else if (strcmp(value, "all") == 0) {
+    state->display_mode = HUD_DISPLAY_MODE_ALL;
+  } else {
+    state->display_mode = HUD_DISPLAY_MODE_CHOSEN;
+    
+    // Parse comma separated list of output names
+    char *value_copy = safe_strdup(value);
+    char *token;
+    char *rest = value_copy;
+    
+    while ((token = strtok_r(rest, ",", &rest))) {
+      state->target_output_count++;
+      state->target_output_names = safe_realloc(state->target_output_names, state->target_output_count * sizeof(char *));
+      state->target_output_names[state->target_output_count - 1] = safe_strdup(token);
+    }
+    free(value_copy);
+  }
+}
+
 static const OptionMap option_handlers[] = {
   {"font_count_max", handle_font_count_max},
   {"font_name", handle_font_name},
@@ -132,6 +154,7 @@ static const OptionMap option_handlers[] = {
   {"default_text_color", handle_default_text_color},
   {"anchor", handle_anchor},
   {"row_spacing", handle_row_spacing},
+  {"target_output", handle_target_output},
 };
 
 static void handle_options_line(char *line, MeowhudState *state) {
@@ -152,7 +175,7 @@ static void handle_options_line(char *line, MeowhudState *state) {
 
 static void check_required(MeowhudState *state) {
   bool valid = true;
-  if (state->height == 0 && state->row_count == 0) {
+  if (state->requested_height == 0 && state->row_count == 0) {
     fprintf(stderr, "height is not set (you could set row_count and height will be set automatically)\n"); 
     valid = false;
   }
@@ -202,8 +225,8 @@ void parse_options(MeowhudState *state) {
   check_required(state);
   init_fonts(state);
 
-  if (state->height == 0) {
-    state->height = state->row_count * (state->font->height + state->row_spacing) - state->row_spacing;
+  if (state->requested_height == 0) {
+    state->requested_height = state->row_count * (state->font->height + state->row_spacing) - state->row_spacing;
   }
 
   free(line);

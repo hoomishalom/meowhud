@@ -81,18 +81,18 @@ pixman_color_t get_color_8_to_16(char *color_string) {
   return color;
 }
 
-void init_rows(Row_s ***rows, size_t row_count) {
-  *rows = (Row_s **)safe_malloc(row_count * sizeof(Row_s *));
+void init_rows(Row ***rows, size_t row_count) {
+  *rows = (Row **)safe_malloc(row_count * sizeof(Row *));
 
   for (size_t i = 0; i < row_count; i++) {
-    Row_s *curr_row = (Row_s *)safe_malloc(sizeof(Row_s));
+    Row *curr_row = (Row *)safe_malloc(sizeof(Row));
 
-    curr_row->left = (Text_s *)safe_malloc(sizeof(Text_s));
+    curr_row->left = (Text *)safe_malloc(sizeof(Text));
     curr_row->left->sections = NULL;
     curr_row->left->section_count = 0;
     curr_row->left->section_count_max = 0;
 
-    curr_row->right = (Text_s *)safe_malloc(sizeof(Text_s));
+    curr_row->right = (Text *)safe_malloc(sizeof(Text));
     curr_row->right->sections = NULL;
     curr_row->right->section_count = 0;
     curr_row->right->section_count_max = 0;
@@ -101,10 +101,10 @@ void init_rows(Row_s ***rows, size_t row_count) {
   }
 }
 
-void free_rows(Row_s **rows, size_t row_count) {
+void free_rows(Row **rows, size_t row_count) {
   if (!rows) return;
   for (size_t i = 0; i < row_count; i++) {
-    Row_s *curr_row = rows[i];
+    Row *curr_row = rows[i];
     if (!curr_row) continue;
 
     if (curr_row->left) {
