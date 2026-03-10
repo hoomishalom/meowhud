@@ -17,34 +17,10 @@ typedef struct {
   OptionHandler handler;
 } OptionMap;
 
-static void handle_font_count_max(MeowhudState *state, const char *value) {
-  uint32_t font_count_max;
-  if (!parse_uint32(value, &font_count_max, 10) || font_count_max == 0) {
-    fprintf(stderr, "font_count is too small or invalid (is: %s, min: %d)\n", value, 0);
-    return;
-  }
-
-  for (size_t i = 0; i < state->font_count; i++) {
-    free(state->font_names[i]);
-  }
-  free(state->font_names);
-  state->font_count = 0;
-
-  state->font_count_max = font_count_max; 
-  state->font_names = (char **)safe_malloc(state->font_count_max * sizeof(char *));
-
-  for (size_t i = 0; i < state->font_count_max; i++) {
-    state->font_names[i] = NULL;
-  }
-}
-
 static void handle_font_name(MeowhudState *state, const char *value) {
-  if (state->font_count_max == 0 || state->font_count >= state->font_count_max) {
-    fprintf(stderr, "No more space for fonts\n");
-    return;
-  }
-  state->font_names[state->font_count] = safe_strdup(value);
   state->font_count++;
+  state->font_names = safe_realloc(state->font_names, state->font_count * sizeof(char *));
+  state->font_names[state->font_count - 1] = safe_strdup(value);
 }
 
 static void handle_width(MeowhudState *state, const char *value) {
@@ -145,7 +121,6 @@ static void handle_target_output(MeowhudState *state, const char *value) {
 }
 
 static const OptionMap option_handlers[] = {
-  {"font_count_max", handle_font_count_max},
   {"font_name", handle_font_name},
   {"width", handle_width},
   {"height", handle_height},
@@ -179,12 +154,8 @@ static void check_required(MeowhudState *state) {
     fprintf(stderr, "height is not set (you could set row_count and height will be set automatically)\n"); 
     valid = false;
   }
-  if (state->font_count_max == 0) {
-    fprintf(stderr, "font_count_max is not set\n");
-    valid = false;
-  }
-  if (state->font_count_max > 0 && state->font_names[0] == NULL) {
-    fprintf(stderr, "atleast one font_name must be set\n");
+  if (state->font_count == 0) {
+    fprintf(stderr, "at least one font_name must be set\n");
     valid = false;
   }
   if (state->bg_color == NULL) {

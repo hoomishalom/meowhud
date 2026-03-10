@@ -50,7 +50,6 @@ void init_state(MeowhudState *state) {
   // Initialize font
   setlocale(LC_ALL, "");
 
-  state->font_count_max = 0;
   state->font_count = 0;
   state->font_names = NULL;
   state->bg_color = NULL;

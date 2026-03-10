@@ -32,7 +32,6 @@ Firstly, the first message should be a sequence of options
 data ended by a `DONE` ([list](#option-list)). For example:
 
 ```
-font_count_max;1
 font_name;Hack Nerd Font:size=24:slant=italic   
 width;0
 bg_color;80e53939
@@ -47,9 +46,8 @@ DONE
 
 #### Font
 
-* `font_count_max`: (Required) An upper bound on the amount of fonts that will be given.
 * `font_name`: (At least one is required) A string representing an installed font and attributes (the second font and onwards will be used as fallbacks in the given order) format: `Name Of Font:attribute1=value1:attribute2=value2:...`.
-* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB` (Hex).
+* `default_text_color`: The default color that is used when a color isn't given, format: `AARRGGBB` (Hexadecimal).
 
 #### Window
 

@@ -72,7 +72,6 @@ typedef struct {
   uint32_t anchor;
 
   // text config
-  uint32_t font_count_max;
   uint32_t font_count;
   char **font_names;
   struct fcft_font *font;
