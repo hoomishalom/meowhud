@@ -4,6 +4,7 @@
 #include "../include/listeners.h"
 #include "../include/types.h"
 #include "../include/utils.h"
+#include "../include/config.h"
 #include "wlr-layer-shell-unstable-v1-protocol.h"
 
 #include <sys/mman.h>
@@ -20,7 +21,7 @@ void init_state(MeowhudState *state) {
   state->compositor = NULL;
   state->layer_shell = NULL;
   state->shm = NULL;
-  
+
   state->huds = NULL;
   state->hud_count = 0;
 
@@ -46,6 +47,7 @@ void init_state(MeowhudState *state) {
   state->requested_height = 0;
   state->requested_width = 0;
   state->anchor = 0;
+  state->exclusive_zone = 0;
 
   // Initialize font
   setlocale(LC_ALL, "");
@@ -70,7 +72,7 @@ void init_state(MeowhudState *state) {
 // gets and configures the layer for a specific HUD
 static void activate_hud(OutputState *hud) {
   hud->surface = wl_compositor_create_surface(hud->global_state->compositor);
-  
+
   hud->layer = zwlr_layer_shell_v1_get_layer_surface(
     hud->global_state->layer_shell,
     hud->surface,
@@ -81,6 +83,20 @@ static void activate_hud(OutputState *hud) {
 
   zwlr_layer_surface_v1_set_anchor(hud->layer, hud->global_state->anchor);
   zwlr_layer_surface_v1_set_size(hud->layer, hud->global_state->requested_width, hud->global_state->requested_height);
+
+  int32_t zone = hud->global_state->exclusive_zone;
+  if (zone == CONFIG_EXCLUSIVE_AUTO) {
+    bool is_left = (hud->global_state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT);
+    bool is_right = (hud->global_state->anchor & ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT);
+    
+    // If it's anchored left XOR right, then it's a vertical bar (an ^ operation wouldn't work as the active bit is in different places)
+    if ((is_left || is_right) && !(is_left && is_right)) {
+      zone = hud->global_state->requested_width; 
+    } else {
+      zone = hud->global_state->requested_height; 
+    }
+  }
+  zwlr_layer_surface_v1_set_exclusive_zone(hud->layer, zone);
 
   // Make the surface pass-through for mouse events
   struct wl_region *empty_region = wl_compositor_create_region(hud->global_state->compositor);
@@ -223,7 +239,7 @@ void cleanup_state(MeowhudState *state) {
   // Free General Colors
   if (state->bg_color) pixman_image_unref(state->bg_color);
   if (state->default_text_color) pixman_image_unref(state->default_text_color);
-  
+
   if (state->target_output_names) {
     for (size_t i = 0; i < state->target_output_count; i++) {
       free(state->target_output_names[i]);

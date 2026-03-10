@@ -120,16 +120,30 @@ static void handle_target_output(MeowhudState *state, const char *value) {
   }
 }
 
+static void handle_exclusive_zone(MeowhudState *state, const char *value) {
+  if (strcmp(value, "auto") == 0) {
+    state->exclusive_zone = CONFIG_EXCLUSIVE_AUTO;
+  } else {
+    int32_t zone;
+    if (!parse_int32(value, &zone, 10)) {
+      fprintf(stderr, "invalid exclusive_zone (is: %s), must be 'auto' or an integer.\n", value);
+      return;
+    }
+    state->exclusive_zone = (int32_t)zone;
+  }
+}
+
 static const OptionMap option_handlers[] = {
-  {"font_name", handle_font_name},
-  {"width", handle_width},
-  {"height", handle_height},
-  {"row_count", handle_row_count},
-  {"bg_color", handle_bg_color},
+  {"font_name",          handle_font_name},
+  {"width",              handle_width},
+  {"height",             handle_height},
+  {"row_count",          handle_row_count},
+  {"bg_color",           handle_bg_color},
   {"default_text_color", handle_default_text_color},
-  {"anchor", handle_anchor},
-  {"row_spacing", handle_row_spacing},
-  {"target_output", handle_target_output},
+  {"anchor",             handle_anchor},
+  {"row_spacing",        handle_row_spacing},
+  {"target_output",      handle_target_output},
+  {"exclusive_zone",     handle_exclusive_zone},
 };
 
 static void handle_options_line(char *line, MeowhudState *state) {

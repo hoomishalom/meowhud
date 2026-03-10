@@ -70,6 +70,7 @@ typedef struct {
   uint32_t requested_width;   // requested dimensions for all of the surfaces
   uint32_t requested_height;  // 
   uint32_t anchor;
+  int32_t exclusive_zone;
 
   // text config
   uint32_t font_count;

@@ -39,6 +39,7 @@ row_count;5
 anchor;1101
 row_spacing;20
 target_output;all
+exclusive_zone;auto
 DONE
 ```
 
@@ -65,7 +66,12 @@ will be calcualted to allow exactly `row_count` rows).
 * `target_output`: Defines which monitor(s) to display the HUD on. 
     * `main`: (Default) Shows on the active/focused monitor.
     * `all`: Shows the HUD on all connected monitors simultaneously.
-    * `[name1],[name2]`: Comma-separated list of exact monitor names (`DP-1,HDMI-A-1`).
+    * `[name1],[name2]`: Comma-separated list of exact monitor names (e.g., `DP-1,HDMI-A-1`).
+* `exclusive_zone`: Defines how the HUD interacts with other windows.
+    * `0`: (Default) Does not push windows, but moves out of the way of others.
+    * `auto`: Automatically reserves screen space based on the HUD's width or height (chosen based on the anchor), pushing standard windows out of the way.
+    * `-1`: Draws on the absolute edge of the screen, overlapping with everything and ignoring other bars.
+    * `<integer>`: A specific pixel distance to reserve (e.g., `40`).
 
 ## Frames
 
